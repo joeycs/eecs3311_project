@@ -16,17 +16,21 @@ feature {NONE} -- Implementation
 
 feature {NONE} -- Initialization
 
-	make (g: attached G)
+	make (g: G)
 			-- Initialization for `Current'.
 		do
-			item := g.deep_twin
+			item := g
 		end
 
 feature -- Queries
 
-	get_clone: G
+	get_new_clone:  G
 		do
-			Result := item
+			separate item as separate_item do
+				check attached separate_item as cloneable then
+					Result := cloneable.deep_twin
+				end
+			end
 		end
 
 end

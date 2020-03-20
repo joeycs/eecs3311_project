@@ -12,8 +12,8 @@ inherit
 
 	CLONEABLE [BENIGN]
 		rename
-			make as make_clone,
-			item as b_clone
+			make as make_cloneable,
+			item as cloneable
 		undefine
 			is_equal
 		end
@@ -32,8 +32,8 @@ feature {NONE} -- Initialization
 			create death_message.make_empty
 			create sector.make_dummy
 			create char.make ('B')
-			b_clone := Current
-			make_clone (Current)
+			cloneable := Current
+			make_cloneable (Current)
 		end
 
 feature -- Queries

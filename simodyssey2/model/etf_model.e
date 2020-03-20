@@ -31,6 +31,7 @@ feature {NONE} -- Initialization
 			-- DEBUG
 			create my_benign.make
 			create my_benign_clone.make
+			create my_benign_clone_2.make
 		end
 
 feature -- model attributes
@@ -45,7 +46,8 @@ feature -- model attributes
 	info : SHARED_INFORMATION_ACCESS
 	-- DEBUG
 	my_benign : BENIGN
-	my_benign_clone : separate BENIGN
+	my_benign_clone : BENIGN
+	my_benign_clone_2 : BENIGN
 
 feature -- model operations
 	reset
@@ -65,9 +67,12 @@ feature -- model operations
 			new_game ("play", 30)
 			update_game (create {STRING}.make_empty)
 			-- DEBUG
-			my_benign_clone := my_benign.get_clone
-			print (  "%N  CLONE IS DIFFERENT OBJECT?:"
-			       + (my_benign /= my_benign_clone).out + "%N")
+			my_benign_clone := my_benign.get_new_clone
+			my_benign_clone_2 := my_benign.get_new_clone
+			print (  "%N  CLONES DIFFERENT OBJECTS?:"
+			       + (my_benign /= my_benign_clone and my_benign /= my_benign_clone_2).out)
+			print (  "%N  CLONES EQUIVALENT OBJECTS?:"
+			       + (my_benign.is_equal (my_benign_clone) and my_benign.is_equal (my_benign_clone_2)).out + "%N")
 		end
 
 	report_status (status_msg: STRING)

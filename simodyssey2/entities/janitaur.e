@@ -12,8 +12,8 @@ inherit
 
 	CLONEABLE [JANITAUR]
 		rename
-			make as make_clone,
-			item as j_clone
+			make as make_cloneable,
+			item as cloneable
 		undefine
 			is_equal
 		end
@@ -28,8 +28,8 @@ feature {NONE} -- Initialization
 			create death_message.make_empty
 			create sector.make_dummy
 			create char.make ('J')
-			j_clone := Current
-			make_clone (Current)
+			cloneable := Current
+			make_cloneable (Current)
 		end
 
 feature
