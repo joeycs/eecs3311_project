@@ -1,26 +1,19 @@
 note
-	description: "Summary description for {BENIGN}."
+	description: "Summary description for {ASTEROID}."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
 
 class
-	BENIGN
+	ASTEROID
 
 inherit
-	SENTIENT_ENTITY
+	MOVABLE_ENTITY
 		redefine
 			ID
 		end
 
 	CPU_ENTITY
-		undefine
-			ID,
-			set_sector,
-			out
-		end
-
-	REPRODUCING_ENTITY
 		undefine
 			ID,
 			set_sector,
@@ -40,14 +33,11 @@ feature {NONE} -- Initialization
 			-- Initialization for `Current'.
 		do
 			create death_message.make_empty
-			create char.make ('B')
+			create char.make ('A')
 			sector := s
 			ID := next_movable_id
 			dead := false
-			actions_left_until_reproduction := reproduction_interval
 		end
-
-feature -- Queries
 
 feature -- Commands
 
@@ -59,4 +49,5 @@ feature -- Commands
 		do
 
 		end
+
 end

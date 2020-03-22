@@ -37,13 +37,13 @@ feature -- game attributes
 	failed_to_move : ARRAY [MOVABLE_ENTITY]
 
 feature -- commands
-	new_game (m : STRING; threshold : INTEGER)
+	new_game (m : STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
 		require
 			valid_mode:
 				   m ~ "test"
 				or m ~ "play"
 		do
-			info.shared_info.set_planet_threshold (threshold)
+			info.shared_info.test (a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			create galaxy.make
 			create moved_this_turn.make_empty
 			create failed_to_move.make_empty
@@ -74,27 +74,18 @@ feature -- commands
 			l_yellow_dwarf: detachable YELLOW_DWARF
 			num: INTEGER
 			ok: BOOLEAN
-			explorer_landed: BOOLEAN
-			planet_has_life: BOOLEAN
+			explorer_won: BOOLEAN
 		do
 			across info.shared_info.sorted_entities is entity loop
 				if attached {EXPLORER} entity as l_explorer then
 					check_entity (l_explorer)
-					if l_explorer.landed then
-						explorer_landed := true
-					end
-
-					across l_explorer.sector.contents is e loop
-						if attached {PLANET} e as l_planet then
-							if l_planet.supports_life then
-								planet_has_life := true
-							end
-						end
+					if l_explorer.found_life then
+						explorer_won := true
 					end
 				end
 			end
 
-			if not (explorer_landed and planet_has_life) then
+			if not explorer_won then
 				across info.shared_info.sorted_entities is entity loop
 					if attached {PLANET} entity as planet then
 						l_star := void

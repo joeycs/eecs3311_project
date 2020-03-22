@@ -10,8 +10,15 @@ class
 inherit
 	MOVABLE_ENTITY
 		redefine
-	        ID,
+			ID,
 			death_message,
+			out
+		end
+
+	CPU_ENTITY
+		undefine
+			ID,
+			set_sector,
 			out
 		end
 
@@ -24,7 +31,6 @@ feature -- attributes
 	supports_life: BOOLEAN
 	visited: BOOLEAN
 	ID: INTEGER
-	turns_left: INTEGER
 	death_message: STRING
 
 feature {NONE} -- Initialization
@@ -33,7 +39,7 @@ feature {NONE} -- Initialization
 			-- Initialization for `Current'.
 		do
 			sector := s
-			ID := next_movable_id + 1
+			ID := next_movable_id
 			is_attached := False
 			supports_life := False
 			visited := False
@@ -57,6 +63,11 @@ set_supports_life
 		supports_life := true
 	end
 
+set_visited
+	do
+		visited := true
+	end
+
 set_behaviour (first_behave: BOOLEAN)
 	local
 		gen: RANDOM_GENERATOR_ACCESS
@@ -77,11 +88,6 @@ set_behaviour (first_behave: BOOLEAN)
 		if not is_attached or first_behave then
 			turns_left := gen.rchoose (0, 2)
 		end
-	end
-
-decrement_turns_left
-	do
-		turns_left := turns_left - 1
 	end
 
 set_death_message (msg: STRING)

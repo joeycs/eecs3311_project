@@ -35,7 +35,8 @@ feature -- command
 			    				l_yellow_dwarf := yd
 							elseif attached {PLANET} entity2 as p then
 								l_planet := p
-								if p.is_attached and (not p.visited) then
+								if  p.is_attached and (not p.visited) and
+								   (not attached l_unvisited_attached_planet) then
 									l_unvisited_attached_planet := p
 								end
 			    			end
@@ -58,7 +59,9 @@ feature -- command
 						model.report_error (  "%N  Negative on that request:no unvisited attached planet at Sector:"
 				            				  + l_explorer.sector.row.out + ":" + l_explorer.sector.column.out    )
 					else
+						l_unvisited_attached_planet.set_visited
 						if l_unvisited_attached_planet.supports_life then
+							l_explorer.set_found_life
 							model.land (l_explorer, "%N  Tranquility base here - we've got a life!")
 							model.win_game
 						else

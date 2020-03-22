@@ -18,7 +18,7 @@ feature -- command
 			if model.game.in_game then
 				model.report_error ("%N  To start a new mission, please abort the current one first.")
 			else
-				model.test(p_threshold)
+				model.test(a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			end
 			etf_cmd_container.on_change.notify ([Current])
     	end

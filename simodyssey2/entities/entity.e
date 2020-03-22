@@ -18,9 +18,8 @@ feature -- attributes
 	char: ENTITY_ALPHABET
 	sector: SECTOR
 	pos: INTEGER
-
 	ID: INTEGER
-		once
+		do
 			Result := -1
 		end
 

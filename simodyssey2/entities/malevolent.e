@@ -9,31 +9,49 @@ class
 
 inherit
 	SENTIENT_ENTITY
+		redefine
+			ID
+		end
 
-	CLONEABLE [MALEVOLENT]
-		rename
-			make as make_cloneable,
-			item as cloneable
+	CPU_ENTITY
 		undefine
-			is_equal
+			ID,
+			set_sector,
+			out
+		end
+
+	REPRODUCING_ENTITY
+		undefine
+			ID,
+			set_sector,
+			out
 		end
 
 create
 	make
 
+feature -- Attributes
+
+	ID: INTEGER
+
 feature {NONE} -- Initialization
 
-	make
+	make (s: SECTOR; next_movable_id: INTEGER)
 			-- Initialization for `Current'.
 		do
 			create death_message.make_empty
 			create sector.make_dummy
 			create char.make ('M')
-			cloneable := Current
-			make_cloneable (Current)
+			ID := next_movable_ID
+			dead := false
+			actions_left_until_reproduction := reproduction_interval
 		end
 
-feature
+feature -- Commands
+
+	set_behaviour (first_behave: BOOLEAN)
+		do
+		end
 
 	set_death_message (msg: STRING)
 		do

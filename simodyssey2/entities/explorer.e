@@ -21,19 +21,14 @@ create
 
 feature -- attributes
 
-	fuel: INTEGER
 	life: INTEGER
 	landed: BOOLEAN
+	found_life: BOOLEAN
 	death_message: STRING
 
 	ID: INTEGER
 		once
 			Result := 0
-		end
-
-	max_fuel: INTEGER
-		once
-			Result := 3
 		end
 
 feature {NONE} -- Initialization
@@ -45,6 +40,7 @@ feature {NONE} -- Initialization
 			fuel := 3
 			life := 3
 			landed := False
+			found_life := False
 			dead := False
 			create char.make ('E')
 			create death_message.make_empty
@@ -66,14 +62,16 @@ feature -- commands
 			landed := False
 		end
 
-	add_fuel (dfuel: INTEGER)
+	set_found_life
 		do
-			fuel := max_fuel.min (fuel + dfuel)
+			found_life := true
 		end
 
 	set_dead
 		do
-			dead := true
+			Precursor
+			
+			-- remove when implement life decrementing
 			life := 0
 		end
 

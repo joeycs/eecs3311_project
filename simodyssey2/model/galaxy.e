@@ -132,7 +132,7 @@ feature --commands
 				until
 					removed or sector.after
 				loop
-					if sector.item.is_equal (e) then
+					if sector.item = e then
 						sector.item.sector.chars_out [sector.item.pos] := '-'
 						sector.remove
 						removed := True
@@ -149,7 +149,7 @@ feature --commands
 				until
 					removed or entities.after
 				loop
-					if entities.item.is_equal (e) then
+					if entities.item = e then
 						entities.remove
 						removed := True
 					else

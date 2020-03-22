@@ -24,14 +24,10 @@ feature {NONE} -- Initialization
 			create game_out.make_empty
 			create mode_out.make_empty
 			create status.make_from_string ("ok")
-			create msg.make_from_string ("%N  Welcome! Try test(30)")
+			create msg.make_from_string ("%N  Welcome! Try test(3,5,7,15,30)")
 			create msg2.make_empty
 			state := 0
 			substate := 0
-			-- DEBUG
-			create my_benign.make
-			create my_benign_clone.make
-			create my_benign_clone_2.make
 		end
 
 feature -- model attributes
@@ -44,10 +40,6 @@ feature -- model attributes
 	state : INTEGER
 	substate : INTEGER
 	info : SHARED_INFORMATION_ACCESS
-	-- DEBUG
-	my_benign : BENIGN
-	my_benign_clone : BENIGN
-	my_benign_clone_2 : BENIGN
 
 feature -- model operations
 	reset
@@ -56,23 +48,16 @@ feature -- model operations
 			make
 		end
 
-	test (p_threshold: INTEGER_32)
+	test (a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
 		do
-			new_game ("test", p_threshold)
+			new_game ("test", a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			update_game (create {STRING}.make_empty)
 		end
 
 	play
 		do
-			new_game ("play", 30)
+			new_game ("play", 3, 5, 7, 15, 30)
 			update_game (create {STRING}.make_empty)
-			-- DEBUG
-			my_benign_clone := my_benign.get_new_clone
-			my_benign_clone_2 := my_benign.get_new_clone
-			print (  "%N  CLONES DIFFERENT OBJECTS?:"
-			       + (my_benign /= my_benign_clone and my_benign /= my_benign_clone_2).out)
-			print (  "%N  CLONES EQUIVALENT OBJECTS?:"
-			       + (my_benign.is_equal (my_benign_clone) and my_benign.is_equal (my_benign_clone_2)).out + "%N")
 		end
 
 	report_status (status_msg: STRING)
@@ -93,12 +78,12 @@ feature -- model operations
 			msg.make_from_string ("%N  Mission aborted. Try test(30)")
 		end
 
-	new_game (mode: STRING; threshold: INTEGER)
+	new_game (mode: STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
 		do
 			status.make_from_string ("ok")
 			msg.make_empty
 			msg2.make_empty
-			game.new_game (mode, threshold)
+			game.new_game (mode, a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			mode_out.make_from_string ("mode:" + game.get_mode + ", ")
 		end
 

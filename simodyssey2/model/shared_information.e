@@ -35,6 +35,30 @@ feature
 
 	entities: LINKED_LIST [ENTITY]
 
+    asteroid_threshold: INTEGER
+		-- used to determine the chance of an asteroid being put in a location
+		attribute
+			Result := 10
+		end
+
+	janitaur_threshold: INTEGER
+		-- used to determine the chance of a janitaur being put in a location
+		attribute
+			Result := 20
+		end
+
+	malevolent_threshold: INTEGER
+		-- used to determine the chance of a malevolent being put in a location
+		attribute
+			Result := 30
+		end
+
+	benign_threshold: INTEGER
+		-- used to determine the chance of a benign being put in a location
+		attribute
+			Result := 40
+		end
+
     planet_threshold: INTEGER
 		-- used to determine the chance of a planet being put in a location
 		attribute
@@ -44,13 +68,43 @@ feature
 	max_capacity: INTEGER = 4
 		 -- max number of objects that can be stored in a location
 
-feature
-	set_planet_threshold(threshold:INTEGER)
+feature -- commands
+	test(a_threshold: INTEGER; j_threshold: INTEGER; m_threshold: INTEGER; b_threshold: INTEGER; p_threshold: INTEGER)
+		--sets threshold values
 		require
 			valid_threshold:
-				0 < threshold and threshold <= 101
+				0 < a_threshold and a_threshold <= j_threshold and j_threshold <= m_threshold
+				and m_threshold <= b_threshold and b_threshold <= p_threshold and p_threshold <= 101
 		do
-			planet_threshold:=threshold
+				set_asteroid_threshold (a_threshold)
+				set_benign_threshold (b_threshold)
+				set_janitaur_threshold (j_threshold)
+				set_malevolent_threshold (m_threshold)
+				set_planet_threshold (p_threshold)
+		end
+
+	set_malevolent_threshold(threshhold:INTEGER)
+		do
+			malevolent_threshold:=threshhold
+		end
+
+	set_janitaur_threshold(threshhold:INTEGER)
+		do
+			janitaur_threshold:=threshhold
+		end
+
+	set_asteroid_threshold(threshhold:INTEGER)
+		do
+			asteroid_threshold:=threshhold
+		end
+	set_planet_threshold(threshhold:INTEGER)
+		do
+			planet_threshold:=threshhold
+		end
+
+	set_benign_threshold(threshhold:INTEGER)
+		do
+			benign_threshold:=threshhold
 		end
 
 	increment_number_of_movable_items

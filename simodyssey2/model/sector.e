@@ -84,15 +84,32 @@ feature -- commands
 				loop_counter > number_items
 			loop
 				threshold := gen.rchoose (1, 100) -- each iteration, generate a new value to compare against the threshold values provided by `test` or `play`
-				if threshold < shared_info.planet_threshold then
-					component := create {PLANET}.make (Current, shared_info.number_of_movable_items)
-					check attached {PLANET} component as planet then
-						planet.set_behaviour (True)
+
+				if threshold < shared_info.asteroid_threshold then
+					component := create {ASTEROID}.make (Current, shared_info.number_of_movable_items + 1)
+				else
+					if threshold < shared_info.janitaur_threshold then
+						component := create {JANITAUR}.make (Current, shared_info.number_of_movable_items + 1)
+					else
+						if (threshold < shared_info.malevolent_threshold) then
+							component := create {MALEVOLENT}.make (Current, shared_info.number_of_movable_items + 1)
+						else
+							if (threshold < shared_info.benign_threshold) then
+								component := create {BENIGN}.make (Current, shared_info.number_of_movable_items + 1)
+							else
+								if threshold < shared_info.planet_threshold then
+									component := create {PLANET}.make (Current, shared_info.number_of_movable_items + 1)
+									check attached {PLANET} component as planet then
+										planet.set_behaviour (True)
+									end
+								end
+							end
+						end
 					end
-					shared_info.increment_number_of_movable_items
 				end
 
 				if attached component as entity then
+					shared_info.increment_number_of_movable_items
 					put (entity) -- add new entity to the contents list
 
 					--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
