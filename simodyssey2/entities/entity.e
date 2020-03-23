@@ -19,9 +19,6 @@ feature -- attributes
 	sector: SECTOR
 	pos: INTEGER
 	ID: INTEGER
-		do
-			Result := -1
-		end
 
 feature -- commands
 
@@ -33,6 +30,11 @@ feature -- commands
 	set_pos (p: INTEGER)
 		do
 			pos := p
+		end
+
+	set_id (i: INTEGER)
+		do
+			ID := i
 		end
 
 feature -- queries

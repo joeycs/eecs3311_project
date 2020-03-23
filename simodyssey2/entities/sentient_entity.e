@@ -29,13 +29,14 @@ feature -- Commands
 			fuel := max_fuel.min (fuel + dfuel)
 		end
 
-	toggle_used_wormhole
+	set_used_wormhole
 		do
-			if not used_wormhole then
-				used_wormhole := True
-			else
-				used_wormhole := False
-			end
+			used_wormhole := True
+		end
+
+	reset_used_wormhole
+		do
+			used_wormhole := False
 		end
 
 end

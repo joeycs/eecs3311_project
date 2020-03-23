@@ -72,8 +72,9 @@ feature -- commands
 		local
 			l_star: detachable STAR
 			l_yellow_dwarf: detachable YELLOW_DWARF
+			l_wormhole: detachable WORMHOLE
 			num: INTEGER
-			ok: BOOLEAN
+			moved: BOOLEAN
 			explorer_won: BOOLEAN
 		do
 			across info.shared_info.sorted_entities is entity loop
@@ -87,40 +88,81 @@ feature -- commands
 
 			if not explorer_won then
 				across info.shared_info.sorted_entities is entity loop
-					if attached {PLANET} entity as planet then
+					if attached {MOVABLE_ENTITY} entity as movable then
+						check_entity (movable)
+					end
+
+					if attached {CPU_ENTITY} entity as cpu then
 						l_star := void
 						l_yellow_dwarf := void
+						l_wormhole := void
 
-						across planet.sector.contents is e loop
+						across cpu.sector.contents is e loop
 							if attached {STAR} e as star then
 								l_star := star
 								if attached {YELLOW_DWARF} star as yd then
 									l_yellow_dwarf := yd
 								end
 							end
+
+							if attached {WORMHOLE} e as wh then
+								l_wormhole := wh
+							end
 						end
 
-						if planet.turns_left = 0 then
+						if cpu.turns_left = 0 then
 
-								if attached l_star then
-									planet.set_attached
-									if attached l_yellow_dwarf then
-										num := galaxy.gen.rchoose (1, 2)
-										if num = 2 then
-											planet.set_supports_life
+								if attached {PLANET} cpu as planet then
+									if attached l_star then
+										planet.set_attached
+										if attached l_yellow_dwarf then
+											num := galaxy.gen.rchoose (1, 2)
+											if num = 2 then
+												planet.set_supports_life
+											end
 										end
 									end
 								else
-									num := galaxy.gen.rchoose (1, 8)
-									ok := move_entity (planet, num)
-								    check_entity (planet)
-									if not planet.is_dead then
-										planet.set_behaviour (False)
+									check attached {MOVABLE_ENTITY} cpu as movable then
+										moved := False
+
+										if attached l_wormhole then
+											if attached {MALEVOLENT} movable as warpable then
+												warp_entity (warpable)
+												moved := True
+											elseif attached {BENIGN} movable as warpable then
+												warp_entity (warpable)
+												moved := True
+											end
+										end
+
+										if not moved then
+											num := galaxy.gen.rchoose (1, 8)
+											moved := move_entity (movable, num)
+										end
+
+									    check_entity (movable)
+										if not movable.is_dead then
+											if attached {REPRODUCING_ENTITY} movable as reproducing then
+												if attached reproducing.get_new_clone as new_clone then
+													new_clone.set_id (info.shared_info.number_of_movable_items + 1)
+													new_clone.set_sector (reproducing.sector)
+													galaxy.put_item (new_clone, reproducing.sector.row, reproducing.sector.column)
+
+													check attached {CPU_ENTITY} new_clone as new_cpu then
+														new_cpu.set_behaviour (True)
+													end
+
+													info.shared_info.increment_number_of_movable_items
+												end
+											end
+											cpu.set_behaviour (False)
+										end
 									end
 								end
 
 						else
-							planet.decrement_turns_left
+							cpu.decrement_turns_left
 						end
 					end
 				end
@@ -199,7 +241,7 @@ feature -- commands
 			Result := attached new_sector
 		end
 
-	warp_entity (l_entity: MOVABLE_ENTITY)
+	warp_entity (l_entity: SENTIENT_ENTITY)
 		local
 			curr_sector: SECTOR
 			new_sector: detachable SECTOR
@@ -222,6 +264,7 @@ feature -- commands
 
 					if attached new_sector then
 						l_entity.set_sector (new_sector)
+						l_entity.set_used_wormhole
 					else
 						moved_this_turn.force (l_entity, moved_this_turn.count + 1)
 						l_entity.set_failed_to_move
@@ -251,25 +294,8 @@ feature -- commands
 				end
 			end
 
---			if attached {EXPLORER} l_entity as l_explorer then
---				if attached l_star then
---					l_explorer.add_fuel (l_star.luminosity)
---				end
-
---				if l_explorer.fuel = 0 then
---					l_explorer.set_dead
---					died_this_turn.force (l_explorer, died_this_turn.count)
---					l_explorer.set_death_message (  " got lost in space - out of fuel at Sector:"
---					                              + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
---				end
---			elseif attached {PLANET} l_entity as l_planet then
---				if attached l_star then
---					l_planet.set_attached
---				end
---			end
-
 			if attached {SENTIENT_ENTITY} l_entity as l_sentient then
-				if moved_this_turn.has (l_sentient) then
+				if moved_this_turn.has (l_sentient) and not l_sentient.used_wormhole then
 					l_sentient.add_fuel (-1)
 				end
 
@@ -279,10 +305,10 @@ feature -- commands
 
 				if l_sentient.fuel = 0 then
 					l_sentient.set_dead
-					died_this_turn.force (l_sentient, died_this_turn.count)
 					l_sentient.set_death_message (  " got lost in space - out of fuel at Sector:"
 					                              + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
 				end
+				l_sentient.reset_used_wormhole
 			elseif attached {PLANET} l_entity as l_planet then
 				if attached l_star then
 					l_planet.set_attached
@@ -291,12 +317,12 @@ feature -- commands
 
 			if attached l_blackhole then
 				l_entity.set_dead
-				died_this_turn.force (l_entity, died_this_turn.count)
 				l_entity.set_death_message (  " got devoured by blackhole (id: " + l_blackhole.ID.out
 					                        + ") at Sector:" + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
 			end
 
 			if l_entity.is_dead then
+				died_this_turn.force (l_entity, died_this_turn.count + 1)
 				galaxy.remove_item (l_entity, l_entity.sector.row, l_entity.sector.column)
 			end
 

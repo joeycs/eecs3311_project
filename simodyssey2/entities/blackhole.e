@@ -10,18 +10,13 @@ class
 inherit
 	STATIONARY_ENTITY
 		redefine
-			ID,
 			out
 		end
 
 create
 	make
 
-feature -- attriutes
-	ID: INTEGER
-		once
-			Result := -1
-		end
+feature -- attributes
 
 feature {NONE} -- Initialization
 
@@ -29,6 +24,7 @@ feature {NONE} -- Initialization
 			-- Initialization for `Current'.
 		do
 			create char.make ('O')
+			ID := -1
 			sector := s
 		end
 

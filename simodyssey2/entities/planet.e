@@ -10,13 +10,11 @@ class
 inherit
 	MOVABLE_ENTITY
 		redefine
-			ID,
 			out
 		end
 
 	CPU_ENTITY
 		undefine
-			ID,
 			set_sector,
 			out
 		end
@@ -29,7 +27,6 @@ feature -- attributes
 	is_attached: BOOLEAN
 	supports_life: BOOLEAN
 	visited: BOOLEAN
-	ID: INTEGER
 
 feature {NONE} -- Initialization
 

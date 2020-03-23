@@ -10,23 +10,17 @@ class
 inherit
 	MOVABLE_ENTITY
 		redefine
-			ID,
 			out
 		end
 
 	CPU_ENTITY
 		undefine
-			ID,
 			set_sector,
 			out
 		end
 
 create
 	make
-
-feature -- Attributes
-
-	ID: INTEGER
 
 feature {NONE} -- Initialization
 
@@ -44,11 +38,14 @@ feature -- Commands
 
 	set_behaviour (first_behave: BOOLEAN)
 		do
-			across sector.sorted_contents is l_entity loop
-				if attached {SENTIENT_ENTITY} l_entity as l_sentient then
-					l_sentient.set_dead
+			if not first_behave then
+				across sector.sorted_contents is l_entity loop
+					if attached {SENTIENT_ENTITY} l_entity as l_sentient then
+						l_sentient.set_dead
+					end
 				end
 			end
+
 			turns_left := gen.rchoose (0, 2)
 		end
 

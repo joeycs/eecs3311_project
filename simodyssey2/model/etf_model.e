@@ -122,11 +122,9 @@ feature -- model operations
 
 	wormhole (l_explorer : EXPLORER)
 		do
-			l_explorer.toggle_used_wormhole
 			game.warp_entity (l_explorer)
 			turn
 			update_game (create {STRING}.make_empty)
-			l_explorer.toggle_used_wormhole
 		end
 
 	update_game (game_msg: STRING)

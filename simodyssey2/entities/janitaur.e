@@ -10,21 +10,18 @@ class
 inherit
 	SENTIENT_ENTITY
 		redefine
-			ID,
 			max_fuel,
 			out
 		end
 
 	CPU_ENTITY
 		undefine
-			ID,
 			set_sector,
 			out
 		end
 
 	REPRODUCING_ENTITY
 		undefine
-			ID,
 			set_sector,
 			out
 		redefine
@@ -36,7 +33,6 @@ create
 
 feature -- Attributes
 
-	ID: INTEGER
 	load: INTEGER
 
 	max_fuel: INTEGER
@@ -63,6 +59,7 @@ feature {NONE} -- Initialization
 			create sector.make_dummy
 			create char.make ('J')
 			ID := next_movable_id
+			sector := s
 			load := 0
 			dead := false
 			fuel := max_fuel
@@ -75,21 +72,24 @@ feature -- Commands
 		local
 			l_wormhole: detachable WORMHOLE
 		do
-			across sector.sorted_contents is l_entity loop
-				if attached {ASTEROID} l_entity as l_asteroid
-				   and load < max_load then
-					l_asteroid.set_dead
-					load := load + 1
+			if not first_behave then
+				across sector.sorted_contents is l_entity loop
+					if attached {ASTEROID} l_entity as l_asteroid
+					   and load < max_load then
+						l_asteroid.set_dead
+						load := load + 1
+					end
+
+					if attached {WORMHOLE} l_entity as wh then
+						l_wormhole := wh
+					end
 				end
 
-				if attached {WORMHOLE} l_entity as wh then
-					l_wormhole := wh
+				if attached l_wormhole then
+					load := 0
 				end
 			end
 
-			if attached l_wormhole then
-				load := 0
-			end
 			turns_left := gen.rchoose (0, 2)
 		end
 

@@ -10,7 +10,6 @@ class
 inherit
 	SENTIENT_ENTITY
 		redefine
-			ID,
 			out
 		end
 
@@ -23,16 +22,12 @@ feature -- attributes
 	landed: BOOLEAN
 	found_life: BOOLEAN
 
-	ID: INTEGER
-		once
-			Result := 0
-		end
-
 feature {NONE} -- Initialization
 
 	make (s: SECTOR)
 			-- Initialization for `Current'.
 		do
+			ID := 0
 			sector := s
 			fuel := max_fuel
 			life := 3
