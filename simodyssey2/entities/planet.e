@@ -11,7 +11,6 @@ inherit
 	MOVABLE_ENTITY
 		redefine
 			ID,
-			death_message,
 			out
 		end
 
@@ -31,7 +30,6 @@ feature -- attributes
 	supports_life: BOOLEAN
 	visited: BOOLEAN
 	ID: INTEGER
-	death_message: STRING
 
 feature {NONE} -- Initialization
 
@@ -70,7 +68,6 @@ set_visited
 
 set_behaviour (first_behave: BOOLEAN)
 	local
-		gen: RANDOM_GENERATOR_ACCESS
 		num: INTEGER
 	do
 		across sector.contents is entity loop

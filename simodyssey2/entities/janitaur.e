@@ -10,7 +10,9 @@ class
 inherit
 	SENTIENT_ENTITY
 		redefine
-			ID
+			ID,
+			max_fuel,
+			out
 		end
 
 	CPU_ENTITY
@@ -37,6 +39,11 @@ feature -- Attributes
 	ID: INTEGER
 	load: INTEGER
 
+	max_fuel: INTEGER
+		once
+			Result := 5
+		end
+
 	max_load: INTEGER
 		once
 			Result := 2
@@ -58,17 +65,49 @@ feature {NONE} -- Initialization
 			ID := next_movable_id
 			load := 0
 			dead := false
+			fuel := max_fuel
 			actions_left_until_reproduction := reproduction_interval
 		end
 
 feature -- Commands
 
 	set_behaviour (first_behave: BOOLEAN)
+		local
+			l_wormhole: detachable WORMHOLE
 		do
+			across sector.sorted_contents is l_entity loop
+				if attached {ASTEROID} l_entity as l_asteroid
+				   and load < max_load then
+					l_asteroid.set_dead
+					load := load + 1
+				end
+
+				if attached {WORMHOLE} l_entity as wh then
+					l_wormhole := wh
+				end
+			end
+
+			if attached l_wormhole then
+				load := 0
+			end
+			turns_left := gen.rchoose (0, 2)
 		end
 
 	set_death_message (msg: STRING)
 		do
-
+			death_message.make_from_string ("Janitaur" + msg)
 		end
+
+feature -- Queries
+
+	out: STRING
+		do
+			create Result.make_from_string ("  ")
+			Result.append (  "[" + ID.out + "," + char.out + "]" + "->"
+				           + "fuel:" + fuel.out + "/" + max_fuel.out + ", "
+				           + "load:" + load.out + "/" + max_load.out + ", "
+				           + "actions_left_until_reproduction:" + actions_left_until_reproduction.out + "/" + reproduction_interval.out
+				           + ", " + "turns_left:" + turns_left.out)
+		end
+
 end

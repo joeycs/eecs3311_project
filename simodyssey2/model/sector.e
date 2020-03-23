@@ -75,7 +75,7 @@ feature -- commands
 			threshold: INTEGER
 			number_items: INTEGER
 			loop_counter: INTEGER
-			component: ENTITY
+			component: CPU_ENTITY
 		do
 			number_items := gen.rchoose (1, shared_info.max_capacity-1)  -- MUST decrease max_capacity by 1 to leave space for Explorer (so a max of 3)
 			from
@@ -99,9 +99,6 @@ feature -- commands
 							else
 								if threshold < shared_info.planet_threshold then
 									component := create {PLANET}.make (Current, shared_info.number_of_movable_items + 1)
-									check attached {PLANET} component as planet then
-										planet.set_behaviour (True)
-									end
 								end
 							end
 						end
@@ -109,6 +106,7 @@ feature -- commands
 				end
 
 				if attached component as entity then
+					component.set_behaviour (True)
 					shared_info.increment_number_of_movable_items
 					put (entity) -- add new entity to the contents list
 
@@ -231,6 +229,22 @@ feature -- Queries
 				end -- if
 				loop_counter := loop_counter + 1
 			end
+		end
+
+	sorted_contents: ARRAY [ENTITY]
+		local
+			a_comparator: ENTITY_COMPARATOR [ENTITY]
+			a_sorter: DS_ARRAY_QUICK_SORTER [ENTITY]
+		do
+			create a_comparator
+			create a_sorter.make (a_comparator)
+			create Result.make_empty
+			across
+				contents is e
+			loop
+				Result.force (e, Result.count + 1)
+			end
+			a_sorter.sort (Result)
 		end
 
 	out: STRING

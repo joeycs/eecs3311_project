@@ -251,15 +251,36 @@ feature -- commands
 				end
 			end
 
-			if attached {EXPLORER} l_entity as l_explorer then
-				if attached l_star then
-					l_explorer.add_fuel (l_star.luminosity)
+--			if attached {EXPLORER} l_entity as l_explorer then
+--				if attached l_star then
+--					l_explorer.add_fuel (l_star.luminosity)
+--				end
+
+--				if l_explorer.fuel = 0 then
+--					l_explorer.set_dead
+--					died_this_turn.force (l_explorer, died_this_turn.count)
+--					l_explorer.set_death_message (  " got lost in space - out of fuel at Sector:"
+--					                              + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
+--				end
+--			elseif attached {PLANET} l_entity as l_planet then
+--				if attached l_star then
+--					l_planet.set_attached
+--				end
+--			end
+
+			if attached {SENTIENT_ENTITY} l_entity as l_sentient then
+				if moved_this_turn.has (l_sentient) then
+					l_sentient.add_fuel (-1)
 				end
 
-				if l_explorer.fuel = 0 then
-					l_explorer.set_dead
-					died_this_turn.force (l_explorer, died_this_turn.count)
-					l_explorer.set_death_message (  " got lost in space - out of fuel at Sector:"
+				if attached l_star then
+					l_sentient.add_fuel (l_star.luminosity)
+				end
+
+				if l_sentient.fuel = 0 then
+					l_sentient.set_dead
+					died_this_turn.force (l_sentient, died_this_turn.count)
+					l_sentient.set_death_message (  " got lost in space - out of fuel at Sector:"
 					                              + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
 				end
 			elseif attached {PLANET} l_entity as l_planet then

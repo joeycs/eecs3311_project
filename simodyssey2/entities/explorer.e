@@ -11,8 +11,6 @@ inherit
 	SENTIENT_ENTITY
 		redefine
 			ID,
-			set_dead,
-			death_message,
 			out
 		end
 
@@ -24,7 +22,6 @@ feature -- attributes
 	life: INTEGER
 	landed: BOOLEAN
 	found_life: BOOLEAN
-	death_message: STRING
 
 	ID: INTEGER
 		once
@@ -37,7 +34,7 @@ feature {NONE} -- Initialization
 			-- Initialization for `Current'.
 		do
 			sector := s
-			fuel := 3
+			fuel := max_fuel
 			life := 3
 			landed := False
 			found_life := False
@@ -62,17 +59,17 @@ feature -- commands
 			landed := False
 		end
 
+	decrement_life
+		do
+			life := life - 1
+			if life = 0 then
+				set_dead
+			end
+		end
+
 	set_found_life
 		do
 			found_life := true
-		end
-
-	set_dead
-		do
-			Precursor
-			
-			-- remove when implement life decrementing
-			life := 0
 		end
 
 	set_death_message (msg: STRING)

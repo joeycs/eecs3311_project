@@ -15,6 +15,7 @@ inherit
 
 feature -- attributes
 
+	gen: RANDOM_GENERATOR_ACCESS
 	prev_sector_row: INTEGER
 	prev_sector_col: INTEGER
 	prev_sector_pos: INTEGER

@@ -75,7 +75,7 @@ feature -- model operations
 			game.end_game
 			game_out.make_empty
 			mode_out.make_empty
-			msg.make_from_string ("%N  Mission aborted. Try test(30)")
+			msg.make_from_string ("%N  Mission aborted. Try test(3,5,7,15,30)")
 		end
 
 	new_game (mode: STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
@@ -91,7 +91,6 @@ feature -- model operations
 		do
 			Result := game.move_entity (l_explorer,  dir)
 			if Result then
-				l_explorer.add_fuel (-1)
 				turn
 				update_game (create {STRING}.make_empty)
 
@@ -123,9 +122,11 @@ feature -- model operations
 
 	wormhole (l_explorer : EXPLORER)
 		do
+			l_explorer.toggle_used_wormhole
 			game.warp_entity (l_explorer)
 			turn
 			update_game (create {STRING}.make_empty)
+			l_explorer.toggle_used_wormhole
 		end
 
 	update_game (game_msg: STRING)
