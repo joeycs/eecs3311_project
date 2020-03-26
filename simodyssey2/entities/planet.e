@@ -45,49 +45,51 @@ feature {NONE} -- Initialization
 
 feature -- commands
 
-set_attached
-	do
-		is_attached := true
-		if (turns_left = 0) then
-			turns_left := -1
-		end
-	end
-
-set_supports_life
-	do
-		supports_life := true
-	end
-
-set_visited
-	do
-		visited := true
-	end
-
-set_behaviour (first_behave: BOOLEAN)
-	local
-		num: INTEGER
-	do
-		across sector.contents is entity loop
-			if attached {STAR} entity as star then
-				set_attached
-				if attached {YELLOW_DWARF} star as yd then
-					num := gen.rchoose (1, 2)
-					if num = 2 then
-						set_supports_life
-					end
-				end
+	set_attached
+		do
+			is_attached := true
+			if (turns_left = 0) then
+				turns_left := -1
 			end
 		end
 
-		if not is_attached or first_behave then
-			turns_left := gen.rchoose (0, 2)
+	set_supports_life
+		do
+			supports_life := true
 		end
-	end
 
-set_death_message (msg: STRING)
-	do
-		death_message.make_from_string ("Planet" + msg)
-	end
+	set_visited
+		do
+			visited := true
+		end
+
+	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
+		local
+			num: INTEGER
+		do
+			across sector.contents is entity loop
+				if attached {STAR} entity as star then
+					set_attached
+					if attached {YELLOW_DWARF} star as yd then
+						num := gen.rchoose (1, 2)
+						rng_usage.extend ("(P->" + num.out + ":[1,2]),")
+						if num = 2 then
+							set_supports_life
+						end
+					end
+				end
+			end
+
+			if not is_attached or first_behave then
+				turns_left := gen.rchoose (0, 2)
+				rng_usage.extend ("(P->" + turns_left.out + ":[0,2]),")
+			end
+		end
+
+	set_death_message (msg: STRING)
+		do
+			death_message.make_from_string ("Planet" + msg)
+		end
 
 feature -- queries
 	out: STRING

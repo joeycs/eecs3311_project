@@ -17,6 +17,7 @@ feature{NONE}
 	make
 		do
 			create entities.make
+			create rng_usage.make
 			entities.compare_objects
 		end
 
@@ -34,6 +35,8 @@ feature
 	number_of_movable_items: INTEGER
 
 	entities: LINKED_LIST [ENTITY]
+
+	rng_usage: LINKED_LIST [STRING]
 
     asteroid_threshold: INTEGER
 		-- used to determine the chance of an asteroid being put in a location
@@ -116,6 +119,11 @@ feature -- commands
 		do
 			entities.wipe_out
 			number_of_movable_items := 0
+		end
+
+	reset_rng
+		do
+			rng_usage.wipe_out
 		end
 
 feature -- queries

@@ -183,5 +183,6 @@ feature -- queries
 			Result.append (msg)
 			Result.append (game_out)
 			Result.append (msg2)
+			info.shared_info.reset_rng
 		end
 end

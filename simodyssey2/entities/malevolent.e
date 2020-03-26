@@ -43,9 +43,14 @@ feature {NONE} -- Initialization
 			actions_left_until_reproduction := reproduction_interval
 		end
 
+feature -- Attributes
+
+	newest_attack: detachable ENTITY
+	attacked_this_turn: BOOLEAN
+
 feature -- Commands
 
-	set_behaviour (first_behave: BOOLEAN)
+	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
 		local
 			l_explorer: detachable EXPLORER
 			l_benign: detachable BENIGN
@@ -63,16 +68,28 @@ feature -- Commands
 				if attached l_explorer and not attached l_benign then
 					if not l_explorer.landed then
 						l_explorer.decrement_life
+						newest_attack := l_explorer
+						attacked_this_turn := True
+					end
+					if l_explorer.dead then
+						l_explorer.set_death_message (  " got lost in space - out of life support at Sector:"
+										               + sector.row.out + ":" + sector.column.out)
 					end
 				end
 			end
 
 			turns_left := gen.rchoose (0, 2)
+			rng_usage.extend ("(M->" + turns_left.out + ":[0,2]),")
 		end
 
 	set_death_message (msg: STRING)
 		do
+			death_message.make_from_string ("Malevolent" + msg)
+		end
 
+	reset_attacked_this_turn
+		do
+			attacked_this_turn := False
 		end
 
 feature -- Queries
@@ -83,6 +100,11 @@ feature -- Queries
 			Result.append (  "[" + ID.out + "," + char.out + "]" + "->"
 				           + "fuel:" + fuel.out + "/" + max_fuel.out + ", "
 				           + "actions_left_until_reproduction:" + actions_left_until_reproduction.out + "/" + reproduction_interval.out
-				           + ", " + "turns_left:" + turns_left.out)
+				           + ", " + "turns_left:")
+			if is_dead then
+				Result.append ("N/A")
+			else
+				Result.append (turns_left.out)
+			end
 		end
 end

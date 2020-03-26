@@ -78,12 +78,14 @@ feature -- commands
 			component: CPU_ENTITY
 		do
 			number_items := gen.rchoose (1, shared_info.max_capacity-1)  -- MUST decrease max_capacity by 1 to leave space for Explorer (so a max of 3)
+			shared_info.rng_usage.extend ("(S->" + number_items.out + ":[1,3]),")
 			from
 				loop_counter := 1
 			until
 				loop_counter > number_items
 			loop
 				threshold := gen.rchoose (1, 100) -- each iteration, generate a new value to compare against the threshold values provided by `test` or `play`
+				shared_info.rng_usage.extend ("(S->" + threshold.out + ":[1,100]),")
 
 				if threshold < shared_info.asteroid_threshold then
 					component := create {ASTEROID}.make (Current, shared_info.number_of_movable_items + 1)
@@ -106,7 +108,7 @@ feature -- commands
 				end
 
 				if attached component as entity then
-					component.set_behaviour (True)
+					component.set_behaviour (True, shared_info.rng_usage)
 					shared_info.increment_number_of_movable_items
 					put (entity) -- add new entity to the contents list
 

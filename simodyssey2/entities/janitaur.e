@@ -68,7 +68,7 @@ feature {NONE} -- Initialization
 
 feature -- Commands
 
-	set_behaviour (first_behave: BOOLEAN)
+	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
 		local
 			l_wormhole: detachable WORMHOLE
 		do
@@ -78,6 +78,8 @@ feature -- Commands
 					   and load < max_load then
 						l_asteroid.set_dead
 						load := load + 1
+						newest_destroy := l_asteroid
+						destroyed_this_turn := True
 					end
 
 					if attached {WORMHOLE} l_entity as wh then
@@ -91,6 +93,7 @@ feature -- Commands
 			end
 
 			turns_left := gen.rchoose (0, 2)
+			rng_usage.extend ("(J->" + turns_left.out + ":[0,2]),")
 		end
 
 	set_death_message (msg: STRING)
@@ -107,7 +110,12 @@ feature -- Queries
 				           + "fuel:" + fuel.out + "/" + max_fuel.out + ", "
 				           + "load:" + load.out + "/" + max_load.out + ", "
 				           + "actions_left_until_reproduction:" + actions_left_until_reproduction.out + "/" + reproduction_interval.out
-				           + ", " + "turns_left:" + turns_left.out)
+				           + ", " + "turns_left:")
+			if is_dead then
+				Result.append ("N/A")
+			else
+				Result.append (turns_left.out)
+			end
 		end
 
 end

@@ -36,17 +36,22 @@ feature {NONE} -- Initialization
 
 feature -- Commands
 
-	set_behaviour (first_behave: BOOLEAN)
+	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
 		do
 			if not first_behave then
 				across sector.sorted_contents is l_entity loop
 					if attached {SENTIENT_ENTITY} l_entity as l_sentient then
 						l_sentient.set_dead
+						l_sentient.set_death_message (  " got destroyed by asteroid (id: " + ID.out
+										              + ") at Sector:" + sector.row.out + ":" + sector.column.out)
+						newest_destroy := l_sentient
+						destroyed_this_turn := True
 					end
 				end
 			end
 
 			turns_left := gen.rchoose (0, 2)
+			rng_usage.extend ("(A->" + turns_left.out + ":[0,2]),")
 		end
 
 	set_death_message (msg: STRING)
@@ -60,7 +65,12 @@ feature -- Queries
 		do
 			create Result.make_from_string ("  ")
 			Result.append (  "[" + ID.out + "," + char.out + "]" + "->"
-			               + "turns_left:" + turns_left.out)
+			               + "turns_left:")
+			if is_dead then
+				Result.append ("N/A")
+			else
+				Result.append (turns_left.out)
+			end
 		end
 
 end

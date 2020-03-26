@@ -77,7 +77,7 @@ feature -- commands
 			moved: BOOLEAN
 			explorer_won: BOOLEAN
 		do
-			across info.shared_info.sorted_entities is entity loop
+			across info.shared_info.entities is entity loop
 				if attached {EXPLORER} entity as l_explorer then
 					check_entity (l_explorer)
 					if l_explorer.found_life then
@@ -88,8 +88,9 @@ feature -- commands
 
 			if not explorer_won then
 				across info.shared_info.sorted_entities is entity loop
-					if attached {MOVABLE_ENTITY} entity as movable then
-						check_entity (movable)
+					if attached {SENTIENT_ENTITY} entity as sentient then
+						sentient.reset_fuel_calculated
+						sentient.reset_used_wormhole
 					end
 
 					if attached {CPU_ENTITY} entity as cpu then
@@ -112,51 +113,52 @@ feature -- commands
 
 						if cpu.turns_left = 0 then
 
-								if attached {PLANET} cpu as planet then
-									if attached l_star then
-										planet.set_attached
-										if attached l_yellow_dwarf then
-											num := galaxy.gen.rchoose (1, 2)
-											if num = 2 then
-												planet.set_supports_life
-											end
+								if attached {PLANET} cpu as planet and attached l_star then
+									planet.set_attached
+									if attached l_yellow_dwarf then
+										num := galaxy.gen.rchoose (1, 2)
+										info.shared_info.rng_usage.extend ("(T->" + num.out + ":[1,2]),")
+										if num = 2 then
+											planet.set_supports_life
 										end
 									end
 								else
 									check attached {MOVABLE_ENTITY} cpu as movable then
 										moved := False
 
-										if attached l_wormhole then
-											if attached {MALEVOLENT} movable as warpable then
-												warp_entity (warpable)
-												moved := True
-											elseif attached {BENIGN} movable as warpable then
-												warp_entity (warpable)
-												moved := True
+										if not movable.is_dead then
+											if attached l_wormhole then
+												if attached {MALEVOLENT} movable as warpable then
+													warp_entity (warpable)
+													moved := True
+												elseif attached {BENIGN} movable as warpable then
+													warp_entity (warpable)
+													moved := True
+												end
 											end
-										end
 
-										if not moved then
-											num := galaxy.gen.rchoose (1, 8)
-											moved := move_entity (movable, num)
+											if not moved then
+												num := galaxy.gen.rchoose (1, 8)
+												info.shared_info.rng_usage.extend ("(T->" + num.out + ":[1,8]),")
+												moved := move_entity (movable, num)
+											end
 										end
 
 									    check_entity (movable)
 										if not movable.is_dead then
 											if attached {REPRODUCING_ENTITY} movable as reproducing then
 												if attached reproducing.get_new_clone as new_clone then
-													new_clone.set_id (info.shared_info.number_of_movable_items + 1)
-													new_clone.set_sector (reproducing.sector)
+													new_clone.set_clone (reproducing.sector, info.shared_info.number_of_movable_items + 1)
 													galaxy.put_item (new_clone, reproducing.sector.row, reproducing.sector.column)
 
 													check attached {CPU_ENTITY} new_clone as new_cpu then
-														new_cpu.set_behaviour (True)
+														new_cpu.set_behaviour (True, info.shared_info.rng_usage)
 													end
 
 													info.shared_info.increment_number_of_movable_items
 												end
 											end
-											cpu.set_behaviour (False)
+											cpu.set_behaviour (False, info.shared_info.rng_usage)
 										end
 									end
 								end
@@ -164,6 +166,12 @@ feature -- commands
 						else
 							cpu.decrement_turns_left
 						end
+					end
+				end
+
+				across info.shared_info.entities is entity loop
+					if attached {MOVABLE_ENTITY} entity as movable then
+						check_entity (movable)
 					end
 				end
 			end
@@ -231,10 +239,10 @@ feature -- commands
 
 			if attached new_sector then
 				moved_this_turn.force (l_entity, moved_this_turn.count + 1)
-			elseif attached {PLANET} l_entity as l_planet then
-				moved_this_turn.force (l_planet, moved_this_turn.count + 1)
-				l_planet.set_failed_to_move
-				failed_to_move.force (l_planet, failed_to_move.count + 1)
+			else
+				moved_this_turn.force (l_entity, moved_this_turn.count + 1)
+				l_entity.set_failed_to_move
+				failed_to_move.force (l_entity, failed_to_move.count + 1)
 			end
 
 			galaxy.put_item (l_entity, l_entity.sector.row, l_entity.sector.column)
@@ -256,7 +264,9 @@ feature -- commands
 				warped
 			loop
 				temp_row := galaxy.gen.rchoose (1, 5)
+				info.shared_info.rng_usage.extend ("(W->" + temp_row.out + ":[1,5]),")
 				temp_col := galaxy.gen.rchoose (1, 5)
+				info.shared_info.rng_usage.extend ("(W->" + temp_col.out + ":[1,5]),")
 
 				if not galaxy.grid[temp_row, temp_col].is_full then
 					galaxy.remove_item (l_entity, l_entity.sector.row, l_entity.sector.column)
@@ -295,23 +305,20 @@ feature -- commands
 			end
 
 			if attached {SENTIENT_ENTITY} l_entity as l_sentient then
-				if moved_this_turn.has (l_sentient) and not l_sentient.used_wormhole then
-					l_sentient.add_fuel (-1)
-				end
+				if not l_sentient.fuel_calculated then
+					if moved_this_turn.has (l_sentient) and not l_sentient.used_wormhole then
+						l_sentient.add_fuel (-1)
+					end
 
-				if attached l_star then
-					l_sentient.add_fuel (l_star.luminosity)
+					if attached l_star then
+						l_sentient.add_fuel (l_star.luminosity)
+					end
 				end
 
 				if l_sentient.fuel = 0 then
 					l_sentient.set_dead
 					l_sentient.set_death_message (  " got lost in space - out of fuel at Sector:"
 					                              + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
-				end
-				l_sentient.reset_used_wormhole
-			elseif attached {PLANET} l_entity as l_planet then
-				if attached l_star then
-					l_planet.set_attached
 				end
 			end
 
@@ -380,6 +387,8 @@ feature -- queries
 			row: INTEGER
 			column: INTEGER
 			sectors: ARRAY2 [STRING]
+			-- DEBUG
+			i: INTEGER
 		do
 			create Result.make_empty
 			create sectors.make_filled ("SECTOR", info.shared_info.number_rows, info.shared_info.number_columns)
@@ -405,13 +414,44 @@ feature -- queries
 				Result.append ("none")
 			else
 				across moved_this_turn is m_e loop
-					if failed_to_move.has (m_e) then
-						Result.append ("%N    [" + m_e.ID.out + "," + m_e.char.out + "]:[" + m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
-					else
-						Result.append ("%N    [" + m_e.ID.out + "," + m_e.char.out + "]:["
-						               + m_e.prev_sector_row.out + "," + m_e.prev_sector_col.out + "," + m_e.prev_sector_pos.out + "]"
+					Result.append ("%N    [" + m_e.ID.out + "," + m_e.char.out + "]:[")
+
+					if not failed_to_move.has (m_e) then
+						Result.append (  m_e.prev_sector_row.out + "," + m_e.prev_sector_col.out + "," + m_e.prev_sector_pos.out + "]"
 						               + "->["
 						               + m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
+					else
+						Result.append (m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
+					end
+
+					if attached {REPRODUCING_ENTITY} m_e as r_e then
+						if r_e.reproduced_this_turn then
+							check attached r_e.newest_clone as l_clone then
+								Result.append (  "%N      reproduced [" + l_clone.ID.out + "," + l_clone.char.out + "] at ["
+											   + l_clone.sector.row.out + "," + l_clone.sector.column.out + "," + l_clone.pos.out + "]")
+							end
+						end
+						r_e.reset_reproduced_this_turn
+					end
+
+					if attached {CPU_ENTITY} m_e as cpu then
+						if cpu.destroyed_this_turn then
+							check attached cpu.newest_destroy as l_destroy then
+								Result.append (  "%N      destroyed [" + l_destroy.ID.out + "," + l_destroy.char.out + "] at ["
+											   + l_destroy.sector.row.out + "," + l_destroy.sector.column.out + "," + l_destroy.pos.out + "]")
+							end
+						end
+						cpu.reset_destroyed_this_turn
+					end
+
+					if attached {MALEVOLENT} m_e as mal then
+						if mal.attacked_this_turn then
+							check attached mal.newest_attack as l_attack then
+								Result.append (  "%N      attacked [" + l_attack.ID.out + "," + l_attack.char.out + "] at ["
+										  	   + l_attack.sector.row.out + "," + l_attack.sector.column.out + "," + l_attack.pos.out + "]")
+							end
+						end
+						mal.reset_attacked_this_turn
 					end
 				end
 			end
@@ -452,6 +492,16 @@ feature -- queries
 			end
 
 			Result.append (galaxy.out)
+			-- DEBUG
+--			i := 1
+--			Result.append ("%N  RNG Usage:%N    ")
+--			across info.shared_info.rng_usage is string loop
+--				Result.append (string)
+--				if i \\ 5 = 0 then
+--					Result.append ("%N    ")
+--				end
+--				i := i + 1
+--			end
 		end
 
 feature {NONE} -- private helper features

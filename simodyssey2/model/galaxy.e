@@ -85,7 +85,9 @@ feature --commands
 				loop_counter > shared_info.number_of_stationary_items
 			loop
 				temp_row :=  gen.rchoose (1, shared_info.number_rows)
+				shared_info.rng_usage.extend ("(G->" + temp_row.out + ":[1,5]),")
 				temp_column := gen.rchoose (1, shared_info.number_columns)
+				shared_info.rng_usage.extend ("(G->" + temp_column.out + ":[1,5]),")
 				check_sector := grid[temp_row,temp_column]
 
 				if (not check_sector.has_stationary) and (not check_sector.is_full) then
@@ -102,6 +104,7 @@ feature --commands
 			num: INTEGER
 		do
 			num := gen.rchoose (1, 3)
+			shared_info.rng_usage.extend ("(G->" + num.out + ":[1,3]),")
 			inspect num
 			when 1 then
 				Result := create {YELLOW_DWARF}.make (sector, id)
