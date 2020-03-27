@@ -11,7 +11,8 @@ inherit
 	SENTIENT_ENTITY
 		redefine
 			max_fuel,
-			out
+			out,
+			set_death_message
 		end
 
 	CPU_ENTITY
@@ -98,7 +99,7 @@ feature -- Commands
 
 	set_death_message (msg: STRING)
 		do
-			death_message.make_from_string ("Janitaur" + msg)
+			Precursor ("Janitaur" + msg)
 		end
 
 feature -- Queries

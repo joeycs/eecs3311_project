@@ -10,7 +10,8 @@ class
 inherit
 	SENTIENT_ENTITY
 		redefine
-			out
+			out,
+			set_death_message
 		end
 
 	CPU_ENTITY
@@ -84,7 +85,7 @@ feature -- Commands
 
 	set_death_message (msg: STRING)
 		do
-			death_message.make_from_string ("Malevolent" + msg)
+			Precursor ("Malevolent" + msg)
 		end
 
 	reset_attacked_this_turn

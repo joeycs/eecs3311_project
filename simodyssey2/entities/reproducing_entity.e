@@ -33,10 +33,21 @@ feature -- Commands
 			actions_left_until_reproduction := reproduction_interval
 			reproduced_this_turn := False
 			reproduce_next_turn := False
+			newest_clone := void
+
 			check attached {SENTIENT_ENTITY} Current as se then
 				se.add_fuel (se.max_fuel)
+				se.reset_fuel_calculated
 				se.reset_used_wormhole
 				se.reset_failed_to_move
+			end
+
+			check attached {CPU_ENTITY} Current as cpu then
+				cpu.reset_destroyed_this_turn
+			end
+
+			if attached {MALEVOLENT} Current as mal then
+				mal.reset_attacked_this_turn
 			end
 		end
 
@@ -51,7 +62,7 @@ feature -- Queries
 		do
 			if (not sector.is_full and actions_left_until_reproduction = 0)
 			    or reproduce_next_turn then
-				Result := Current.deep_twin
+				Result := Current.twin
 				newest_clone := Result
 				actions_left_until_reproduction := reproduction_interval
 				reproduce_next_turn := False

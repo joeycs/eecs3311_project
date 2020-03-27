@@ -10,7 +10,8 @@ class
 inherit
 	SENTIENT_ENTITY
 		redefine
-			out
+			out,
+			set_death_message
 		end
 
 create
@@ -69,7 +70,7 @@ feature -- commands
 
 	set_death_message (msg: STRING)
 		do
-			death_message.make_from_string ("Explorer" + msg)
+			Precursor ("Explorer" + msg)
 		end
 
 feature -- queries

@@ -49,7 +49,8 @@ feature -- commands
 		end
 
 	set_death_message (msg: STRING)
-		deferred
+		do
+			create death_message.make_from_string (msg)
 		end
 
 feature -- queries

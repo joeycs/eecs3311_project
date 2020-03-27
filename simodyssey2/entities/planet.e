@@ -10,7 +10,8 @@ class
 inherit
 	MOVABLE_ENTITY
 		redefine
-			out
+			out,
+			set_death_message
 		end
 
 	CPU_ENTITY
@@ -88,7 +89,7 @@ feature -- commands
 
 	set_death_message (msg: STRING)
 		do
-			death_message.make_from_string ("Planet" + msg)
+			Precursor ("Planet" + msg)
 		end
 
 feature -- queries
