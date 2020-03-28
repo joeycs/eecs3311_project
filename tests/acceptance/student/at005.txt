@@ -21,7 +21,7 @@ pass
 pass
 pass
 abort
-test(10,10,70,14,90)
+test(10,10,70,84,90)
 test(10,10,70,80,90)
 move(N)
 
