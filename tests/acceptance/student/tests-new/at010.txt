@@ -1,8 +1,0 @@
--- Moving the explorer before a game has started
-move(E)
-play
-play
-move(E)
-move(E)
-abort 
-
