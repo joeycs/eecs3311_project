@@ -1,5 +1,0 @@
--- Checking the postion of the explorer after moving pass the boundaires of the board (movement West)
-play
-move(W)
-move(W)
-
