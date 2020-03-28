@@ -1,0 +1,13 @@
+-- when the explorer wins in play mode 
+play
+pass
+pass
+pass
+pass
+move(W)
+land
+status
+liftoff
+move(SW)
+move(S)
+land

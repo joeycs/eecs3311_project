@@ -1,0 +1,5 @@
+-- When the Explorer get devoured by a blackhole
+play
+move(NW)
+move(NW)
+move(NW)

@@ -1,0 +1,14 @@
+-- When explorer passes through a wormhole and then tries to land
+play
+pass
+pass
+pass
+pass
+move(NW)
+wormhole
+move(E)
+land
+
+
+
+

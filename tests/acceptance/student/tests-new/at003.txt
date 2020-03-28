@@ -1,0 +1,5 @@
+-- When the explorer loses by running out of fuel 
+play
+move(S)
+move(E)
+move(S)

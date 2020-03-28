@@ -1,0 +1,8 @@
+-- When the Explorer lands in a sector with two planets and a yellow dwarf
+test(40,40,40,40,80)
+pass
+pass
+move(E)
+land
+land
+
