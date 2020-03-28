@@ -73,26 +73,26 @@ feature -- commands
 			l_star: detachable STAR
 			l_yellow_dwarf: detachable YELLOW_DWARF
 			l_wormhole: detachable WORMHOLE
+			l_explorer: EXPLORER
 			num: INTEGER
 			moved: BOOLEAN
-			explorer_won: BOOLEAN
 		do
 			across info.shared_info.entities is entity loop
-				if attached {EXPLORER} entity as l_explorer then
+				if attached {SENTIENT_ENTITY} entity as sentient then
+					sentient.reset_fuel_calculated
+					sentient.reset_used_wormhole
+				end
+
+				if attached {EXPLORER} entity as explorer then
+					l_explorer := explorer
 					check_entity (l_explorer)
-					if l_explorer.found_life then
-						explorer_won := true
-					end
 				end
 			end
 
-			if not explorer_won then
-				across info.shared_info.sorted_entities is entity loop
-					if attached {SENTIENT_ENTITY} entity as sentient then
-						sentient.reset_fuel_calculated
-						sentient.reset_used_wormhole
-					end
+			check attached l_explorer then end
 
+			if not l_explorer.found_life then
+				across info.shared_info.sorted_entities is entity loop
 					if attached {CPU_ENTITY} entity as cpu then
 						l_star := void
 						l_yellow_dwarf := void
@@ -163,15 +163,14 @@ feature -- commands
 									end
 								end
 
+								across cpu.sector.sorted_contents is item loop
+									if attached {MOVABLE_ENTITY} item as movable then
+										check_entity (movable)
+									end
+								end
 						else
 							cpu.decrement_turns_left
 						end
-					end
-				end
-
-				across info.shared_info.entities is entity loop
-					if attached {MOVABLE_ENTITY} entity as movable then
-						check_entity (movable)
 					end
 				end
 			end
@@ -237,14 +236,12 @@ feature -- commands
 				end
 			end
 
-			if attached new_sector then
-				moved_this_turn.force (l_entity, moved_this_turn.count + 1)
-			else
-				moved_this_turn.force (l_entity, moved_this_turn.count + 1)
+			if not attached new_sector then
 				l_entity.set_failed_to_move
 				failed_to_move.force (l_entity, failed_to_move.count + 1)
 			end
 
+			moved_this_turn.force (l_entity, moved_this_turn.count + 1)
 			galaxy.put_item (l_entity, l_entity.sector.row, l_entity.sector.column)
 			Result := attached new_sector
 		end
@@ -276,7 +273,6 @@ feature -- commands
 						l_entity.set_sector (new_sector)
 						l_entity.set_used_wormhole
 					else
-						moved_this_turn.force (l_entity, moved_this_turn.count + 1)
 						l_entity.set_failed_to_move
 						failed_to_move.force (l_entity, failed_to_move.count + 1)
 					end
@@ -305,8 +301,8 @@ feature -- commands
 			end
 
 			if attached {SENTIENT_ENTITY} l_entity as l_sentient then
-				if not l_sentient.fuel_calculated then
-					if moved_this_turn.has (l_sentient) and not l_sentient.used_wormhole then
+				if not l_sentient.fuel_calculated and moved_this_turn.has (l_sentient) then
+					if not (l_sentient.used_wormhole or failed_to_move.has (l_sentient)) then
 						l_sentient.add_fuel (-1)
 					end
 
@@ -328,7 +324,7 @@ feature -- commands
 					                        + ") at Sector:" + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
 			end
 
-			if l_entity.is_dead then
+			if l_entity.is_dead and not died_this_turn.has (l_entity) then
 				died_this_turn.force (l_entity, died_this_turn.count + 1)
 				galaxy.remove_item (l_entity, l_entity.sector.row, l_entity.sector.column)
 			end
@@ -416,12 +412,12 @@ feature -- queries
 				across moved_this_turn is m_e loop
 					Result.append ("%N    [" + m_e.ID.out + "," + m_e.char.out + "]:[")
 
-					if not failed_to_move.has (m_e) then
+					if failed_to_move.has (m_e) then
+						Result.append (m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
+					else
 						Result.append (  m_e.prev_sector_row.out + "," + m_e.prev_sector_col.out + "," + m_e.prev_sector_pos.out + "]"
 						               + "->["
 						               + m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
-					else
-						Result.append (m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
 					end
 
 					if attached {REPRODUCING_ENTITY} m_e as r_e then
@@ -430,18 +426,18 @@ feature -- queries
 								Result.append (  "%N      reproduced [" + l_clone.ID.out + "," + l_clone.char.out + "] at ["
 											   + l_clone.sector.row.out + "," + l_clone.sector.column.out + "," + l_clone.pos.out + "]")
 							end
+							r_e.reset_reproduced_this_turn
 						end
-						r_e.reset_reproduced_this_turn
 					end
 
 					if attached {CPU_ENTITY} m_e as cpu then
 						if cpu.destroyed_this_turn then
-							check attached cpu.newest_destroy as l_destroy then
-								Result.append (  "%N      destroyed [" + l_destroy.ID.out + "," + l_destroy.char.out + "] at ["
-											   + l_destroy.sector.row.out + "," + l_destroy.sector.column.out + "," + l_destroy.pos.out + "]")
+							across cpu.destroys_this_turn is l_destroy loop
+									Result.append (  "%N      destroyed [" + l_destroy.ID.out + "," + l_destroy.char.out + "] at ["
+												   + l_destroy.sector.row.out + "," + l_destroy.sector.column.out + "," + l_destroy.pos.out + "]")
 							end
+							cpu.reset_destroyed_this_turn
 						end
-						cpu.reset_destroyed_this_turn
 					end
 
 					if attached {MALEVOLENT} m_e as mal then
@@ -450,8 +446,8 @@ feature -- queries
 								Result.append (  "%N      attacked [" + l_attack.ID.out + "," + l_attack.char.out + "] at ["
 										  	   + l_attack.sector.row.out + "," + l_attack.sector.column.out + "," + l_attack.pos.out + "]")
 							end
+							mal.reset_attacked_this_turn
 						end
-						mal.reset_attacked_this_turn
 					end
 				end
 			end

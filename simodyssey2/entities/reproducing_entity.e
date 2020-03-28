@@ -21,7 +21,6 @@ feature -- Attributes
 		end
 
 	reproduced_this_turn: BOOLEAN
-	reproduce_next_turn: BOOLEAN
 	newest_clone: detachable ENTITY
 
 feature -- Commands
@@ -32,7 +31,6 @@ feature -- Commands
 			ID := next_movable_id
 			actions_left_until_reproduction := reproduction_interval
 			reproduced_this_turn := False
-			reproduce_next_turn := False
 			newest_clone := void
 
 			check attached {SENTIENT_ENTITY} Current as se then
@@ -60,19 +58,15 @@ feature -- Queries
 
 	get_new_clone: detachable like Current
 		do
-			if (not sector.is_full and actions_left_until_reproduction = 0)
-			    or reproduce_next_turn then
+			if not sector.is_full and actions_left_until_reproduction = 0 then
 				Result := Current.twin
 				newest_clone := Result
 				actions_left_until_reproduction := reproduction_interval
-				reproduce_next_turn := False
 				reproduced_this_turn := True
 			else
 				if actions_left_until_reproduction /= 0 then
 					actions_left_until_reproduction :=
 					actions_left_until_reproduction - 1
-				elseif sector.is_full then
-					reproduce_next_turn := True
 				end
 			end
 		end

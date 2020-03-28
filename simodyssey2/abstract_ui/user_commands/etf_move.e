@@ -26,7 +26,7 @@ feature
 				model.report_error ("%N  Negative on that request:no mission in progress.")
 			else
 				across
-					model.game.info.Shared_info.entities is entity
+					model.game.info.shared_info.entities is entity
 				loop
 					if attached {EXPLORER} entity as explorer then
 						l_entity := model.game.find_entity (explorer)

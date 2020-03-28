@@ -41,6 +41,7 @@ feature {NONE} -- Initialization
 			dead := false
 			fuel := max_fuel
 			actions_left_until_reproduction := reproduction_interval
+			create destroys_this_turn.make
 		end
 
 feature -- Commands
@@ -53,7 +54,7 @@ feature -- Commands
 						l_malev.set_dead
 						l_malev.set_death_message (  " got destroyed by benign (id: " + ID.out
 										              + ") at Sector:" + sector.row.out + ":" + sector.column.out)
-						newest_destroy := l_malev
+						destroys_this_turn.extend (l_malev)
 						destroyed_this_turn := True
 					end
 				end

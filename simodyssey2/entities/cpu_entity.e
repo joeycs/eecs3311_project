@@ -14,7 +14,7 @@ inherit
 feature -- Attributes
 
 	turns_left: INTEGER
-	newest_destroy: detachable ENTITY
+	destroys_this_turn: LINKED_LIST [ENTITY]
 	destroyed_this_turn: BOOLEAN
 
 feature -- Commands
@@ -31,6 +31,7 @@ feature -- Commands
 	reset_destroyed_this_turn
 		do
 			destroyed_this_turn := False
+			create destroys_this_turn.make
 		end
 
 end

@@ -65,6 +65,7 @@ feature {NONE} -- Initialization
 			dead := false
 			fuel := max_fuel
 			actions_left_until_reproduction := reproduction_interval
+			create destroys_this_turn.make
 		end
 
 feature -- Commands
@@ -78,8 +79,10 @@ feature -- Commands
 					if attached {ASTEROID} l_entity as l_asteroid
 					   and load < max_load then
 						l_asteroid.set_dead
+						l_asteroid.set_death_message (  " got imploded by janitaur (id: " + ID.out
+										              + ") at Sector:" + sector.row.out + ":" + sector.column.out)
 						load := load + 1
-						newest_destroy := l_asteroid
+						destroys_this_turn.extend (l_asteroid)
 						destroyed_this_turn := True
 					end
 
@@ -91,6 +94,8 @@ feature -- Commands
 				if attached l_wormhole then
 					load := 0
 				end
+			else
+				load := 0
 			end
 
 			turns_left := gen.rchoose (0, 2)

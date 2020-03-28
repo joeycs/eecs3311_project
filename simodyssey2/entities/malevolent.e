@@ -42,6 +42,7 @@ feature {NONE} -- Initialization
 			dead := false
 			fuel := max_fuel
 			actions_left_until_reproduction := reproduction_interval
+			create destroys_this_turn.make
 		end
 
 feature -- Attributes

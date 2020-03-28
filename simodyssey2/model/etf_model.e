@@ -100,10 +100,14 @@ feature -- model operations
 			end
 		end
 
-	pass
+	pass (l_explorer: EXPLORER)
 		do
 			turn
 			update_game (create {STRING}.make_empty)
+
+			if l_explorer.is_dead then
+				lose_game (l_explorer.death_message)
+			end
 		end
 
 	land (l_explorer : EXPLORER; land_msg : STRING)

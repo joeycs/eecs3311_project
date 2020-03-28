@@ -42,6 +42,7 @@ feature {NONE} -- Initialization
 			dead := False
 			create char.make ('P')
 			create death_message.make_empty
+			create destroys_this_turn.make
 		end
 
 feature -- commands

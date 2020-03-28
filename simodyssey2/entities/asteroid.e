@@ -33,6 +33,7 @@ feature {NONE} -- Initialization
 			sector := s
 			ID := next_movable_id
 			dead := false
+			create destroys_this_turn.make
 		end
 
 feature -- Commands
@@ -45,7 +46,7 @@ feature -- Commands
 						l_sentient.set_dead
 						l_sentient.set_death_message (  " got destroyed by asteroid (id: " + ID.out
 										              + ") at Sector:" + sector.row.out + ":" + sector.column.out)
-						newest_destroy := l_sentient
+						destroys_this_turn.extend (l_sentient)
 						destroyed_this_turn := True
 					end
 				end
