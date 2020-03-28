@@ -1,5 +1,0 @@
--- Checking the postion of the explorer after passing the boundaries of the board
-play
-move(NW)
-move(NW)
-move(S)
