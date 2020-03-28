@@ -1,0 +1,6 @@
+-- When planets and janitaur gets devoured by blackhole
+test(20,30,40,50,100)
+move(S)
+move(E)
+move(S)
+

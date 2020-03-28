@@ -1,0 +1,4 @@
+-- Attempting to start another game when the user is already in a game
+test(1,2,3,4,5)
+test(50,50,50,50,50)
+abort

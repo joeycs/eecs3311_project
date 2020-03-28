@@ -1,0 +1,8 @@
+-- when explorer tries to move to a sector that is full
+test(50,50,50,50,50)
+status
+status
+move(S)
+move(E)
+move(S)
+

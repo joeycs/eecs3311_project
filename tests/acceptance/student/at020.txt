@@ -1,0 +1,6 @@
+-- when asteroids get imploded by janitaur
+test(30,35,44,50,70)
+move(S)
+move(E)
+move(S)
+

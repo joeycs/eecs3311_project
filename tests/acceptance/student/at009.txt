@@ -1,0 +1,22 @@
+-- Using the command pass x20
+play
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass

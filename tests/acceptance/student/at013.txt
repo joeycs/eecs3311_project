@@ -1,0 +1,26 @@
+-- Landing on a planet then lifting off
+play
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+move(S)
+move(S)
+land
+liftoff

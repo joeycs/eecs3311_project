@@ -1,0 +1,27 @@
+-- When the explorer gets destroyed by an astroid
+test(3,5,7,15,30)
+move(N)
+move(NE)
+move(SW)
+land
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+pass
+abort
+test(10,10,70,14,90)
+test(10,10,70,80,90)
+move(N)
+
