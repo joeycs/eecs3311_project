@@ -251,6 +251,7 @@ feature -- commands
 			curr_sector: SECTOR
 			new_sector: detachable SECTOR
 			warped : BOOLEAN
+			same_loc: BOOLEAN
 			temp_row: INTEGER
 			temp_col: INTEGER
 		do
@@ -273,11 +274,22 @@ feature -- commands
 						l_entity.set_sector (new_sector)
 						l_entity.set_used_wormhole
 					else
+						same_loc := True
+					end
+
+					galaxy.put_item (l_entity, l_entity.sector.row, l_entity.sector.column)
+
+					if    l_entity.sector.row = l_entity.prev_sector_row
+				      and l_entity.sector.column = l_entity.prev_sector_col
+				      and l_entity.pos = l_entity.prev_sector_pos then
+						same_loc := True
+					end
+
+					if same_loc then
 						l_entity.set_failed_to_move
 						failed_to_move.force (l_entity, failed_to_move.count + 1)
 					end
 
-					galaxy.put_item (l_entity, l_entity.sector.row, l_entity.sector.column)
 			        moved_this_turn.force (l_entity, moved_this_turn.count + 1)
 					warped := True
 				end
@@ -543,7 +555,7 @@ feature {NONE} -- private helper features
 						end
 
 						if not galaxy.grid[new_row, new_col].is_full
-						   or  (drow = 0 and dcol = 0)               then
+						   or  (new_row = row and new_col = column) then
 							Result := galaxy.grid[new_row, new_col]
 						end
 					end

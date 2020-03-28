@@ -11,6 +11,7 @@ inherit
 	SENTIENT_ENTITY
 		redefine
 			out,
+			set_dead,
 			set_death_message
 		end
 
@@ -66,6 +67,14 @@ feature -- commands
 	set_found_life
 		do
 			found_life := true
+		end
+
+	set_dead
+		do
+			Precursor
+			if life /= 0 then
+				life := 0
+			end
 		end
 
 	set_death_message (msg: STRING)
