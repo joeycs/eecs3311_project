@@ -1,8 +1,0 @@
--- Checking the status of the Explorer
-status
-test(10,33,40,40,90)
-status
-status
-move(S)
-move(S)
-
