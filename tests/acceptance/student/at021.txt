@@ -1,4 +1,4 @@
--- Checking to see if the postion of the explorer remains consistant after multiple pass and move commands
+-- Checking to see if the position of the explorer remains consistant after multiple pass and move commands
 test(20,40,70,80,100)
 move(S)
 move(E)
