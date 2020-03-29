@@ -1,0 +1,15 @@
+play
+status
+status
+status
+move(E)
+move(E)
+move(E)
+move(E)
+move(E)
+move(E)
+move(E)
+move(E)
+move(E)
+move(E)
+
