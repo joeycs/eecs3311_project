@@ -23,7 +23,7 @@ feature {NONE} -- initialization
 			create mode.make_empty
 			create galaxy.make_dummy
 			create moved_this_turn.make_empty
-			create failed_to_move.make_empty
+			--create failed_to_move.make_empty
 			create died_this_turn.make_empty
 		end
 
@@ -34,7 +34,7 @@ feature -- game attributes
 	galaxy : GALAXY
 	moved_this_turn : ARRAY [MOVABLE_ENTITY]
 	died_this_turn : ARRAY [MOVABLE_ENTITY]
-	failed_to_move : ARRAY [MOVABLE_ENTITY]
+	--failed_to_move : ARRAY [MOVABLE_ENTITY]
 
 feature -- commands
 	new_game (m : STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
@@ -46,7 +46,7 @@ feature -- commands
 			info.shared_info.test (a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			create galaxy.make
 			create moved_this_turn.make_empty
-			create failed_to_move.make_empty
+			--create failed_to_move.make_empty
 			create died_this_turn.make_empty
 			game := game + 1
 			mode.make_from_string (m)
@@ -238,7 +238,7 @@ feature -- commands
 
 			if not attached new_sector then
 				l_entity.set_failed_to_move
-				failed_to_move.force (l_entity, failed_to_move.count + 1)
+				--failed_to_move.force (l_entity, failed_to_move.count + 1)
 			end
 
 			moved_this_turn.force (l_entity, moved_this_turn.count + 1)
@@ -287,7 +287,7 @@ feature -- commands
 
 					if same_loc then
 						l_entity.set_failed_to_move
-						failed_to_move.force (l_entity, failed_to_move.count + 1)
+						--failed_to_move.force (l_entity, failed_to_move.count + 1)
 					end
 
 			        moved_this_turn.force (l_entity, moved_this_turn.count + 1)
@@ -314,7 +314,7 @@ feature -- commands
 
 			if attached {SENTIENT_ENTITY} l_entity as l_sentient then
 				if not l_sentient.fuel_calculated and moved_this_turn.has (l_sentient) then
-					if not (l_sentient.used_wormhole or failed_to_move.has (l_sentient)) then
+					if not (l_sentient.used_wormhole or l_sentient.failed_to_move) then
 						l_sentient.add_fuel (-1)
 					end
 
@@ -330,7 +330,7 @@ feature -- commands
 				end
 			end
 
-			if attached l_blackhole then
+			if not l_entity.dead and attached l_blackhole then
 				l_entity.set_dead
 				l_entity.set_death_message (  " got devoured by blackhole (id: " + l_blackhole.ID.out
 					                        + ") at Sector:" + l_entity.sector.row.out + ":" + l_entity.sector.column.out)
@@ -424,13 +424,14 @@ feature -- queries
 				across moved_this_turn is m_e loop
 					Result.append ("%N    [" + m_e.ID.out + "," + m_e.char.out + "]:[")
 
-					if failed_to_move.has (m_e) then
+					if m_e.failed_to_move then
 						Result.append (m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
 					else
 						Result.append (  m_e.prev_sector_row.out + "," + m_e.prev_sector_col.out + "," + m_e.prev_sector_pos.out + "]"
 						               + "->["
 						               + m_e.sector.row.out + "," + m_e.sector.column.out + "," + m_e.pos.out + "]")
 					end
+					m_e.reset_failed_to_move
 
 					if attached {REPRODUCING_ENTITY} m_e as r_e then
 						if r_e.reproduced_this_turn then
@@ -500,6 +501,9 @@ feature -- queries
 			end
 
 			Result.append (galaxy.out)
+			moved_this_turn.make_empty
+			--failed_to_move.make_empty
+			died_this_turn.make_empty
 			-- DEBUG
 --			i := 1
 --			Result.append ("%N  RNG Usage:%N    ")

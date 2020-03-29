@@ -40,6 +40,8 @@ feature
 						model.report_error ("%N  Negative on that request:you are currently landed at Sector:" + l_explorer.sector.row.out + ":" + l_explorer.sector.column.out)
 					elseif not model.move (l_explorer, dir) then
 						model.report_error ("%N  Cannot transfer to new location as it is full.")
+						l_explorer.reset_failed_to_move
+						model.game.moved_this_turn.make_empty
 					end
 				end
 			end

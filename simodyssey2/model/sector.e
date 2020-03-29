@@ -160,7 +160,6 @@ feature {GALAXY} --command
 			if attached {MOVABLE_ENTITY} l_entity as m_e then
 				if m_e.failed_to_move then
 					stay := true
-					m_e.reset_failed_to_move
 					chars_out [m_e.pos] := l_entity.char.item
 				end
 			end

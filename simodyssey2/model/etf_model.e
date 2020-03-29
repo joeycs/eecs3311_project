@@ -138,9 +138,6 @@ feature -- model operations
 			status.make_from_string ("ok")
 			msg.make_from_string (game_msg)
 			game_out.make_from_string (game.out)
-			game.moved_this_turn.make_empty
-			game.failed_to_move.make_empty
-			game.died_this_turn.make_empty
 		end
 
 	win_game
