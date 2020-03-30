@@ -17,7 +17,7 @@ wormhole
 move(SW)
 move(NW)
 move(SW)
-move(SW)'move(SW)
+move(SW)
 land
 pass
 pass
