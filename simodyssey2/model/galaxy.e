@@ -85,9 +85,7 @@ feature --commands
 				loop_counter > shared_info.number_of_stationary_items
 			loop
 				temp_row :=  gen.rchoose (1, shared_info.number_rows)
-				shared_info.rng_usage.extend ("(G->" + temp_row.out + ":[1,5]),")
 				temp_column := gen.rchoose (1, shared_info.number_columns)
-				shared_info.rng_usage.extend ("(G->" + temp_column.out + ":[1,5]),")
 				check_sector := grid[temp_row,temp_column]
 
 				if (not check_sector.has_stationary) and (not check_sector.is_full) then
@@ -104,7 +102,6 @@ feature --commands
 			num: INTEGER
 		do
 			num := gen.rchoose (1, 3)
-			shared_info.rng_usage.extend ("(G->" + num.out + ":[1,3]),")
 			inspect num
 			when 1 then
 				Result := create {YELLOW_DWARF}.make (sector, id)
@@ -118,17 +115,19 @@ feature --commands
 		end
 
 	put_item (e : ENTITY; row : INTEGER; col : INTEGER)
+			-- place given entity in sector located at [row, col] in the grid
 		do
 			grid[row, col].put (e)
 		end
 
 	remove_item (e : ENTITY; row : INTEGER; col : INTEGER)
+			-- remove given entity in sector located at [row, col] in the grid
 		local
 			sector : ARRAYED_LIST [ENTITY]
 			entities : LINKED_LIST [ENTITY]
 			removed : BOOLEAN
 		do
-				-- Remove from sector
+				-- remove from sector
 				from
 					sector := grid[row, col].contents
 					sector.start
@@ -144,7 +143,7 @@ feature --commands
 					end
 				end
 
-				-- Remove from entities list
+				-- remove from entities list
 				from
 					entities := shared_info.entities
 					entities.start
@@ -163,6 +162,7 @@ feature --commands
 
 feature -- query
 	has_free_sector: BOOLEAN
+			-- determine if the grid contains at least one sector which has at least one free location
 		local
 			row: INTEGER
 			column: INTEGER
@@ -230,26 +230,20 @@ feature -- query
 					contents_counter > temp_sector.contents.count
 				loop
 					temp_component := temp_sector.contents[contents_counter]
---					if attached temp_component as entity then
---						string2.append_character(entity.char.item)
---					else
---						string2.append("-")
---					end -- if
-					printed_symbols_counter:=printed_symbols_counter+1
+					printed_symbols_counter:= printed_symbols_counter+1
 					contents_counter := contents_counter + 1
-				end -- loop
+				end
 
 				from
 				until (shared_info.max_capacity - printed_symbols_counter)=0
 				loop
-						--string2.append("-")
 						printed_symbols_counter:=printed_symbols_counter+1
 
 				end
 				string2.append (temp_sector.chars_out)
 				string2.append("   ")
 				column_counter := column_counter + 1
-			end -- loop
+			end
 			string1.append("%N")
 			if not (row_counter = shared_info.number_rows) then
 				string2.append("%N")

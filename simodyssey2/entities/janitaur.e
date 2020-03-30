@@ -70,7 +70,7 @@ feature {NONE} -- Initialization
 
 feature -- Commands
 
-	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
+	set_behaviour (first_behave: BOOLEAN)
 		local
 			l_wormhole: detachable WORMHOLE
 		do
@@ -99,7 +99,6 @@ feature -- Commands
 			end
 
 			turns_left := gen.rchoose (0, 2)
-			rng_usage.extend ("(J->" + turns_left.out + ":[0,2]),")
 		end
 
 	set_death_message (msg: STRING)

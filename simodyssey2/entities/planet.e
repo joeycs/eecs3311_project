@@ -65,7 +65,7 @@ feature -- commands
 			visited := true
 		end
 
-	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
+	set_behaviour (first_behave: BOOLEAN)
 		local
 			num: INTEGER
 		do
@@ -74,7 +74,6 @@ feature -- commands
 					set_attached
 					if attached {YELLOW_DWARF} star as yd then
 						num := gen.rchoose (1, 2)
-						rng_usage.extend ("(P->" + num.out + ":[1,2]),")
 						if num = 2 then
 							set_supports_life
 						end
@@ -84,7 +83,6 @@ feature -- commands
 
 			if not is_attached or first_behave then
 				turns_left := gen.rchoose (0, 2)
-				rng_usage.extend ("(P->" + turns_left.out + ":[0,2]),")
 			end
 		end
 

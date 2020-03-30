@@ -18,26 +18,26 @@ create
 
 feature {NONE} -- initialization
 	make
+			-- Initialization for `Current'.
 		do
 			game := 0
 			create mode.make_empty
 			create galaxy.make_dummy
 			create moved_this_turn.make_empty
-			--create failed_to_move.make_empty
 			create died_this_turn.make_empty
 		end
 
-feature -- game attributes
+feature -- attributes
 	info : SHARED_INFORMATION_ACCESS
 	game : INTEGER
 	mode : STRING
 	galaxy : GALAXY
 	moved_this_turn : ARRAY [MOVABLE_ENTITY]
 	died_this_turn : ARRAY [MOVABLE_ENTITY]
-	--failed_to_move : ARRAY [MOVABLE_ENTITY]
 
 feature -- commands
 	new_game (m : STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
+			-- Re-initialize game with given game mode and thresholds while keeping track of the current game number
 		require
 			valid_mode:
 				   m ~ "test"
@@ -46,7 +46,6 @@ feature -- commands
 			info.shared_info.test (a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			create galaxy.make
 			create moved_this_turn.make_empty
-			--create failed_to_move.make_empty
 			create died_this_turn.make_empty
 			game := game + 1
 			mode.make_from_string (m)
@@ -58,6 +57,7 @@ feature -- commands
 		end
 
 	end_game
+			-- End the current game, resetting the state of the galaxy
 		require
 			in_game
 		do
@@ -69,6 +69,9 @@ feature -- commands
 		end
 
 	advance_turn
+			-- Allow all movable entities to move once
+			-- Entities' behaviours are determined
+			-- Entities perform secondary actions if applicable
 		local
 			l_star: detachable STAR
 			l_yellow_dwarf: detachable YELLOW_DWARF
@@ -117,7 +120,6 @@ feature -- commands
 									planet.set_attached
 									if attached l_yellow_dwarf then
 										num := galaxy.gen.rchoose (1, 2)
-										info.shared_info.rng_usage.extend ("(T->" + num.out + ":[1,2]),")
 										if num = 2 then
 											planet.set_supports_life
 										end
@@ -139,7 +141,6 @@ feature -- commands
 
 											if not moved then
 												num := galaxy.gen.rchoose (1, 8)
-												info.shared_info.rng_usage.extend ("(T->" + num.out + ":[1,8]),")
 												moved := move_entity (movable, num)
 											end
 										end
@@ -152,13 +153,13 @@ feature -- commands
 													galaxy.put_item (new_clone, reproducing.sector.row, reproducing.sector.column)
 
 													check attached {CPU_ENTITY} new_clone as new_cpu then
-														new_cpu.set_behaviour (True, info.shared_info.rng_usage)
+														new_cpu.set_behaviour (True)
 													end
 
 													info.shared_info.increment_number_of_movable_items
 												end
 											end
-											cpu.set_behaviour (False, info.shared_info.rng_usage)
+											cpu.set_behaviour (False)
 										end
 									end
 								end
@@ -177,6 +178,7 @@ feature -- commands
 		end
 
 	move_entity (l_entity: MOVABLE_ENTITY;  dir: INTEGER): BOOLEAN
+			-- Move given movable entity in given direction
 		local
 			curr_sector: SECTOR
 			new_sector: detachable SECTOR
@@ -247,6 +249,7 @@ feature -- commands
 		end
 
 	warp_entity (l_entity: SENTIENT_ENTITY)
+			-- Move given entity to a random location in the galaxy
 		local
 			curr_sector: SECTOR
 			new_sector: detachable SECTOR
@@ -262,9 +265,7 @@ feature -- commands
 				warped
 			loop
 				temp_row := galaxy.gen.rchoose (1, 5)
-				info.shared_info.rng_usage.extend ("(W->" + temp_row.out + ":[1,5]),")
 				temp_col := galaxy.gen.rchoose (1, 5)
-				info.shared_info.rng_usage.extend ("(W->" + temp_col.out + ":[1,5]),")
 
 				if not galaxy.grid[temp_row, temp_col].is_full then
 					galaxy.remove_item (l_entity, l_entity.sector.row, l_entity.sector.column)
@@ -287,7 +288,6 @@ feature -- commands
 
 					if same_loc then
 						l_entity.set_failed_to_move
-						--failed_to_move.force (l_entity, failed_to_move.count + 1)
 					end
 
 			        moved_this_turn.force (l_entity, moved_this_turn.count + 1)
@@ -297,6 +297,8 @@ feature -- commands
 		end
 
 	check_entity (l_entity: MOVABLE_ENTITY)
+			-- Check the state of the given movable entity
+			-- Check if the entity has used fuel, gained fuel, or died if applicable
 		local
 			l_star : detachable STAR
 			l_blackhole : detachable BLACKHOLE
@@ -345,21 +347,26 @@ feature -- commands
 
 feature -- queries
 	in_game : BOOLEAN
+			-- Checks if a game is in progress
 		do
 			Result := not mode.is_empty
 		end
 
 	get_game : INTEGER
+			-- Returns the current game number
 		do
 			Result := game
 		end
 
 	get_mode : STRING
+			-- Returns the current game mode
 		do
 			Result := mode
 		end
 
 	find_entity (e: ENTITY): detachable ENTITY
+			-- Attempts to return the given entity as it exists in the galaxy
+			-- Uses entity comparator to determine if an object equivalent entity exists in the galaxy
 		local
 			row: INTEGER
 			column: INTEGER
@@ -386,6 +393,7 @@ feature -- queries
 		end
 
 	check_move (l_entity: MOVABLE_ENTITY;  dir: INTEGER): BOOLEAN
+			-- Determines if moving the given entity in given direction is a valid action
 		do
 			Result := move_entity (l_entity, dir)
 		end
@@ -395,8 +403,6 @@ feature -- queries
 			row: INTEGER
 			column: INTEGER
 			sectors: ARRAY2 [STRING]
-			-- DEBUG
-			i: INTEGER
 		do
 			create Result.make_empty
 			create sectors.make_filled ("SECTOR", info.shared_info.number_rows, info.shared_info.number_columns)
@@ -502,18 +508,7 @@ feature -- queries
 
 			Result.append (galaxy.out)
 			moved_this_turn.make_empty
-			--failed_to_move.make_empty
 			died_this_turn.make_empty
-			-- DEBUG
---			i := 1
---			Result.append ("%N  RNG Usage:%N    ")
---			across info.shared_info.rng_usage is string loop
---				Result.append (string)
---				if i \\ 5 = 0 then
---					Result.append ("%N    ")
---				end
---				i := i + 1
---			end
 		end
 
 feature {NONE} -- private helper features

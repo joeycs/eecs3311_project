@@ -17,7 +17,6 @@ feature{NONE}
 	make
 		do
 			create entities.make
-			create rng_usage.make
 			entities.compare_objects
 		end
 
@@ -33,10 +32,10 @@ feature
 			-- The number of stationary_items in the grid
 
 	number_of_movable_items: INTEGER
+			-- The number of movable items in the grid
 
 	entities: LINKED_LIST [ENTITY]
-
-	rng_usage: LINKED_LIST [STRING]
+			-- List of entities currently existing in the grid
 
     asteroid_threshold: INTEGER
 		-- used to determine the chance of an asteroid being put in a location
@@ -116,18 +115,16 @@ feature -- commands
 		end
 
 	reset
+			-- clear grid of all entities
 		do
 			entities.wipe_out
 			number_of_movable_items := 0
 		end
 
-	reset_rng
-		do
-			rng_usage.wipe_out
-		end
-
 feature -- queries
 	sorted_entities: ARRAY [ENTITY]
+			-- returns sorted array of entities existing in current grid
+			-- sorted by ID in ascending order
 		local
 			a_comparator: ENTITY_COMPARATOR [ENTITY]
 			a_sorter: DS_ARRAY_QUICK_SORTER [ENTITY]

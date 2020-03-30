@@ -49,18 +49,20 @@ feature -- model operations
 		end
 
 	test (a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
+			-- Initiate game in test mode with given thresholds.
 		do
 			new_game ("test", a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			update_game (create {STRING}.make_empty)
 		end
 
-	play
+	play	-- Initiate game in play mode with default thresholds.
 		do
 			new_game ("play", 3, 5, 7, 15, 30)
 			update_game (create {STRING}.make_empty)
 		end
 
 	report_status (status_msg: STRING)
+			-- Display the explorer's current status.
 		do
 			substate := substate + 1
 			status.make_from_string ("ok")
@@ -69,6 +71,7 @@ feature -- model operations
 		end
 
 	abort
+			-- Terminate the current game.
 		do
 			substate := substate + 1
 			status.make_from_string ("ok")
@@ -79,6 +82,7 @@ feature -- model operations
 		end
 
 	new_game (mode: STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
+			-- Initiate game with given game mode and thresholds.
 		do
 			status.make_from_string ("ok")
 			msg.make_empty
@@ -88,6 +92,7 @@ feature -- model operations
 		end
 
 	move (l_explorer: EXPLORER;  dir: INTEGER): BOOLEAN
+			-- Move the explorer in direction provided by the user.
 		do
 			Result := game.move_entity (l_explorer,  dir)
 			if Result then
@@ -101,6 +106,7 @@ feature -- model operations
 		end
 
 	pass (l_explorer: EXPLORER)
+			-- Allow the game to advance one turn without explorer performing an action.
 		do
 			turn
 			update_game (create {STRING}.make_empty)
@@ -111,6 +117,7 @@ feature -- model operations
 		end
 
 	land (l_explorer : EXPLORER; land_msg : STRING)
+			-- Attempt to land the explorer on a planet.
 		do
 	    	l_explorer.land
 	    	turn
@@ -118,6 +125,7 @@ feature -- model operations
 		end
 
 	liftoff (l_explorer : EXPLORER; lift_msg : STRING)
+			-- Attempt to lift the explorer off of its current planet.
 		do
 			l_explorer.liftoff
 			turn
@@ -125,6 +133,7 @@ feature -- model operations
 		end
 
 	wormhole (l_explorer : EXPLORER)
+			-- Attempt to warp the explorer to a random location in the galaxy.
 		do
 			game.warp_entity (l_explorer)
 			turn
@@ -132,6 +141,7 @@ feature -- model operations
 		end
 
 	update_game (game_msg: STRING)
+			-- Display the current state of the game and galaxy.
 		do
 			state := state + 1
 			substate := 0
@@ -141,12 +151,14 @@ feature -- model operations
 		end
 
 	win_game
+			-- Initiate game win state.
 		do
 			game.end_game
 			game_out.make_empty
 		end
 
 	lose_game (lose_msg: STRING)
+			-- Initiate game lose state.
 		do
 			msg.make_from_string ("%N  " + lose_msg + "%N  The game has ended. You can start a new game.")
 
@@ -158,11 +170,13 @@ feature -- model operations
 		end
 
 	turn
+			-- Advance the game one turn.
 		do
 			game.advance_turn
 		end
 
 	report_error (error_msg: STRING)
+			-- Display current error information.
 		do
 			substate := substate + 1
 			status.make_from_string ("error")
@@ -184,6 +198,5 @@ feature -- queries
 			Result.append (msg)
 			Result.append (game_out)
 			Result.append (msg2)
-			info.shared_info.reset_rng
 		end
 end

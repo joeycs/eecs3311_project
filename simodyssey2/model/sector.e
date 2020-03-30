@@ -33,6 +33,7 @@ feature -- attributes
 	column: INTEGER
 
 	chars_out: STRING
+		-- string representation of entities existing in current sector
 
 feature -- constructor
 	make(row_input: INTEGER; column_input: INTEGER; a_explorer:ENTITY)
@@ -78,14 +79,12 @@ feature -- commands
 			component: CPU_ENTITY
 		do
 			number_items := gen.rchoose (1, shared_info.max_capacity-1)  -- MUST decrease max_capacity by 1 to leave space for Explorer (so a max of 3)
-			shared_info.rng_usage.extend ("(S->" + number_items.out + ":[1,3]),")
 			from
 				loop_counter := 1
 			until
 				loop_counter > number_items
 			loop
 				threshold := gen.rchoose (1, 100) -- each iteration, generate a new value to compare against the threshold values provided by `test` or `play`
-				shared_info.rng_usage.extend ("(S->" + threshold.out + ":[1,100]),")
 
 				if threshold < shared_info.asteroid_threshold then
 					component := create {ASTEROID}.make (Current, shared_info.number_of_movable_items + 1)
@@ -108,7 +107,7 @@ feature -- commands
 				end
 
 				if attached component as entity then
-					component.set_behaviour (True, shared_info.rng_usage)
+					component.set_behaviour (True)
 					shared_info.increment_number_of_movable_items
 					put (entity) -- add new entity to the contents list
 
@@ -153,6 +152,7 @@ feature {GALAXY} --command
 		end
 
 	next_available_quad (l_entity: ENTITY)
+			-- places given entity in next free location of current sector starting from position 1
 		local
 			found: BOOLEAN
 			stay: BOOLEAN
@@ -233,6 +233,8 @@ feature -- Queries
 		end
 
 	sorted_contents: ARRAY [ENTITY]
+			-- returns sorted array of entities existing in current sector
+			-- sorted by ID in ascending order
 		local
 			a_comparator: ENTITY_COMPARATOR [ENTITY]
 			a_sorter: DS_ARRAY_QUICK_SORTER [ENTITY]
@@ -249,6 +251,7 @@ feature -- Queries
 		end
 
 	out: STRING
+			-- returns string representation of this sector
 		local
 			quads: ARRAY [STRING]
 		do

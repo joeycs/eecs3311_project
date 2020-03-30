@@ -19,7 +19,7 @@ feature -- Attributes
 
 feature -- Commands
 
-	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
+	set_behaviour (first_behave: BOOLEAN)
 		deferred
 		end
 

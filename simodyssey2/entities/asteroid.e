@@ -38,7 +38,7 @@ feature {NONE} -- Initialization
 
 feature -- Commands
 
-	set_behaviour (first_behave: BOOLEAN; rng_usage: LINKED_LIST [STRING])
+	set_behaviour (first_behave: BOOLEAN)
 		do
 			if not first_behave then
 				across sector.sorted_contents is l_entity loop
@@ -53,7 +53,6 @@ feature -- Commands
 			end
 
 			turns_left := gen.rchoose (0, 2)
-			rng_usage.extend ("(A->" + turns_left.out + ":[0,2]),")
 		end
 
 	set_death_message (msg: STRING)
