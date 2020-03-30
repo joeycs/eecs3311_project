@@ -1,0 +1,5 @@
+-- Test behaviour when benign, explorer, and malevolent are in the same sector
+test(50,60,70,80,90)
+move(N)
+pass
+pass

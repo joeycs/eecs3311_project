@@ -81,14 +81,12 @@ feature -- commands
 			moved: BOOLEAN
 		do
 			across info.shared_info.entities is entity loop
-				if attached {SENTIENT_ENTITY} entity as sentient then
-					sentient.reset_fuel_calculated
-					sentient.reset_used_wormhole
-				end
-
 				if attached {EXPLORER} entity as explorer then
 					l_explorer := explorer
 					check_entity (l_explorer)
+				elseif attached {SENTIENT_ENTITY} entity as sentient then
+					sentient.reset_fuel_calculated
+					sentient.reset_used_wormhole
 				end
 			end
 
@@ -174,6 +172,9 @@ feature -- commands
 						end
 					end
 				end
+
+				l_explorer.reset_fuel_calculated
+				l_explorer.reset_used_wormhole
 			end
 		end
 
@@ -273,7 +274,6 @@ feature -- commands
 
 					if attached new_sector then
 						l_entity.set_sector (new_sector)
-						l_entity.set_used_wormhole
 					else
 						same_loc := True
 					end
@@ -290,6 +290,7 @@ feature -- commands
 						l_entity.set_failed_to_move
 					end
 
+					l_entity.set_used_wormhole
 			        moved_this_turn.force (l_entity, moved_this_turn.count + 1)
 					warped := True
 				end
