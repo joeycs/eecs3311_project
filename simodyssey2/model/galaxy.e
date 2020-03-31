@@ -118,6 +118,11 @@ feature --commands
 			-- place given entity in sector located at [row, col] in the grid
 		do
 			grid[row, col].put (e)
+--		ensure
+--			added_to_grid:
+--				shared_info.entities.has (e)
+--			added_to_sector:
+--				e.sector.contents.has (e)
 		end
 
 	remove_item (e : ENTITY; row : INTEGER; col : INTEGER)
@@ -158,6 +163,15 @@ feature --commands
 						entities.forth
 					end
 				end
+--		ensure
+--			removed_from_grid:
+--				(old shared_info.entities.deep_twin).has (e)
+--				implies
+--				not shared_info.entities.has (e)
+--			removed_from_sector:
+--				(old e.sector.contents.deep_twin).has (e)
+--				implies
+--				not e.sector.contents.has (e)
 		end
 
 feature -- query
@@ -186,6 +200,9 @@ feature -- query
 				end
 				row := row + 1
 			end
+--		ensure
+--			grid_not_full:
+--				Result implies shared_info.entities.count < 100
 		end
 
 	out: STRING

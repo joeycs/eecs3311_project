@@ -38,10 +38,10 @@ feature -- attributes
 feature -- commands
 	new_game (m : STRING; a_threshold, j_threshold, m_threshold, b_threshold, p_threshold: INTEGER)
 			-- Re-initialize game with given game mode and thresholds while keeping track of the current game number
-		require
-			valid_mode:
-				   m ~ "test"
-				or m ~ "play"
+--		require
+--			valid_mode:
+--				   m ~ "test"
+--				or m ~ "play"
 		do
 			info.shared_info.test (a_threshold, j_threshold, m_threshold, b_threshold, p_threshold)
 			create galaxy.make
@@ -49,29 +49,36 @@ feature -- commands
 			create died_this_turn.make_empty
 			game := game + 1
 			mode.make_from_string (m)
-		ensure
-			game_incremented:
-				game = old game + 1
-			mode_set:
-				mode ~ m
+--		ensure
+--			game_incremented:
+--				game = old game + 1
+--			mode_set:
+--				mode ~ m
 		end
 
 	end_game
 			-- End the current game, resetting the state of the galaxy
-		require
-			in_game
+--		require
+--			in_game
 		do
 			mode.make_empty
 			info.shared_info.reset
-		ensure
-			game_over:
-				mode.is_empty
+--		ensure
+--			game_over:
+--				mode.is_empty
 		end
 
 	advance_turn
 			-- Allow all movable entities to move once
 			-- Entities' behaviours are determined
 			-- Entities perform secondary actions if applicable
+--		require
+--			galaxy_populated:
+--				not info.shared_info.entities.is_empty
+--			galaxy_has_movable:
+--				across info.shared_info.entities is entity some
+--					attached {MOVABLE_ENTITY} entity
+--				end
 		local
 			l_star: detachable STAR
 			l_yellow_dwarf: detachable YELLOW_DWARF
@@ -176,10 +183,22 @@ feature -- commands
 				l_explorer.reset_fuel_calculated
 				l_explorer.reset_used_wormhole
 			end
+--		ensure
+--			dead_entities_removed:
+--				across (old info.shared_info.entities.twin) is entity all
+--					(attached {MOVABLE_ENTITY} entity as m_e and then m_e.is_dead)
+--					implies
+--					not info.shared_info.entities.has (m_e)
+--				end
 		end
 
 	move_entity (l_entity: MOVABLE_ENTITY;  dir: INTEGER): BOOLEAN
 			-- Move given movable entity in given direction
+--		require
+--			entity_exists_in_galaxy:
+--				info.shared_info.entities.has (l_entity)
+--			entity_alive:
+--				not l_entity.is_dead
 		local
 			curr_sector: SECTOR
 			new_sector: detachable SECTOR
@@ -241,16 +260,26 @@ feature -- commands
 
 			if not attached new_sector then
 				l_entity.set_failed_to_move
-				--failed_to_move.force (l_entity, failed_to_move.count + 1)
 			end
 
 			moved_this_turn.force (l_entity, moved_this_turn.count + 1)
 			galaxy.put_item (l_entity, l_entity.sector.row, l_entity.sector.column)
 			Result := attached new_sector
+--		ensure
+--			successful_move:
+--				not l_entity.failed_to_move implies
+--				(	l_entity.sector.row /= l_entity.prev_sector_row
+--				 or l_entity.sector.column /= l_entity.prev_sector_col
+--				 or l_entity.pos /= l_entity.prev_sector_pos          )
 		end
 
 	warp_entity (l_entity: SENTIENT_ENTITY)
 			-- Move given entity to a random location in the galaxy
+--		require
+--			entity_exists_in_galaxy:
+--				info.shared_info.entities.has (l_entity)
+--			entity_alive:
+--				not l_entity.is_dead
 		local
 			curr_sector: SECTOR
 			new_sector: detachable SECTOR
@@ -295,6 +324,12 @@ feature -- commands
 					warped := True
 				end
 			end
+--		ensure
+--			successful_move:
+--				not l_entity.failed_to_move implies
+--				(	l_entity.sector.row /= l_entity.prev_sector_row
+--				 or l_entity.sector.column /= l_entity.prev_sector_col
+--				 or l_entity.pos /= l_entity.prev_sector_pos          )
 		end
 
 	check_entity (l_entity: MOVABLE_ENTITY)
@@ -344,6 +379,10 @@ feature -- commands
 				galaxy.remove_item (l_entity, l_entity.sector.row, l_entity.sector.column)
 			end
 
+--		ensure
+--			entity_died:
+--				l_entity.is_dead implies
+--				died_this_turn.has (l_entity) and not l_entity.death_message.is_empty
 		end
 
 feature -- queries
@@ -565,7 +604,7 @@ feature {NONE} -- private helper features
 			end
 		end
 
---	invariant
---		valid_game:
---			game >= 0
+	invariant
+		valid_game:
+			game >= 0
 end

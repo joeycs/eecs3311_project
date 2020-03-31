@@ -173,6 +173,9 @@ feature {GALAXY} --command
 					end
 				end
 			end
+--		ensure
+--			correct_position:
+--				chars_out [l_entity.pos] ~ l_entity.char.item
 		end
 
 feature -- Queries
